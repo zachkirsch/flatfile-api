@@ -7,24 +7,32 @@ service:
   auth: false
   base-path: /files
   endpoints:
-    getFiles:
+    getAll:
       path: ""
       method: GET
       display-name: List files
       request:
+        name: GetAllFilesRequest
         query-parameters:
           spaceId: optional<string>
       response: Files
 
-    createFile:
+    create:
       path: ""
       method: POST
       display-name: Upload a file
       request:
-        body: "#/components/requestBodies/UploadFile"
+        name: CreateFileRequest
+        body:
+          properties:
+            spaceId: commons.SpaceId 
+            environmentId: commons.EnvironmentId
+            file:
+              type: string #TODO support binary
+              docs: A binary payload containing the file contents
       response: commons.File
 
-    getFile:
+    get:
       path: /{fileId}
       method: GET
       display-name: Get a file
@@ -32,7 +40,7 @@ service:
         fileId: string
       response: commons.File
 
-    deleteFile:
+    delete:
       path: /{fileId}
       method: DELETE
       display-name: Delete a file
@@ -40,20 +48,24 @@ service:
         fileId: string
       response: commons.Success
 
-    updateFileById:
+    update:
       path: /{fileId}
       method: PATCH
       docs: Update a file, to change the workbook id for example
-      display-name: Update a File
+      display-name: Update a file
       path-parameters:
         fileId:
           docs: ID of file to update
           type: string
       request:
-        body: "#/components/requestBodies/File"
+        name: UpdateFileRequest
+        body:
+          properties:
+            workbookId: commons.WorkbookId 
+            status: commons.ModelFileStatusEnum
       response: commons.File
 
-    downloadFile:
+    download:
       path: /{fileId}/download
       method: GET
       display-name: Download a file
