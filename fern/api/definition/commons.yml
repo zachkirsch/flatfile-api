@@ -67,9 +67,9 @@ types:
       environmentId: EnvironmentId
       email: string
       name: string
-      spaces: list<_InlinedType2>
+      spaces: list<Space>
 
-  _InlinedType2:
+  Space:
     properties:
       id: SpaceId
       lastAccessed: optional<string>
@@ -125,9 +125,9 @@ types:
           Whether or not new spaces have the option to copy files and guests
           from existing spaces, defaults to false
         type: optional<boolean>
-      guestAuthentication: optional<list<_InlinedType3>>
+      guestAuthentication: optional<list<GuestAuthentication>>
 
-  _InlinedType3:
+  GuestAuthentication:
     docs: The type of authentication to use for guests
     enum:
       - shared_link
@@ -170,12 +170,12 @@ types:
         type: optional<list<EventTopic>>
       compiler:
         docs: The compiler of the agent
-        type: optional<_InlinedType4>
+        type: optional<Compiler>
       source:
         docs: The source of the agent
         type: optional<string>
 
-  _InlinedType4:
+  Compiler:
     docs: The compiler of the agent
     enum:
       - js
@@ -183,29 +183,52 @@ types:
   EventTopic:
     docs: The topic of the event
     enum:
-      - space:added
-      - space:removed
-      - workbook:added
-      - workbook:removed
-      - user:added
-      - user:removed
-      - user:online
-      - user:offline
-      - upload:started
-      - upload:failed
-      - upload:completed
-      - job:started
-      - job:waiting
-      - job:updated
-      - job:failed
-      - job:completed
-      - job:deleted
-      - records:created
-      - records:updated
-      - records:deleted
-      - sheet:validated
-      - file:deleted
-      - action:triggered
+      - value: space:added
+        name: space_added
+      - value: space:removed
+        name: space_removed
+      - value: workbook:added
+        name: workbook_added
+      - value: workbook:removed
+        name: workbook_removed
+      - value: user:added
+        name: user_added
+      - value: user:removed
+        name: user_removed
+      - value: user:online
+        name: user_online
+      - value: user:offline
+        name: user_offline
+      - value: upload:started
+        name: upload_started
+      - value: upload:failed
+        name: upload_failed
+      - value: upload:completed
+        name: upload_completed
+      - value: job:started
+        name: job_started
+      - value: job:waiting
+        name: job_waiting
+      - value: job:updated
+        name: job_updated
+      - value: job:failed
+        name: job_failed
+      - value: job:completed
+        name: job_completed
+      - value: job:deleted
+        name: job_deleted
+      - value: records:created
+        name: records_created
+      - value: records:updated
+        name: records_updated
+      - value: records:deleted
+        name: records_deleted
+      - value: sheet:validated
+        name: sheet_validated
+      - value: action:triggered
+        name: action_triggered
+      - value: file:deleted
+        name: file_deleted
 
   Event:
     properties:
@@ -216,14 +239,14 @@ types:
     properties:
       domain:
         docs: The domain of the event
-        type: _InlinedType5
+        type: Domain
       topic: EventTopic
       context:
         docs: The context of the event
-        type: _InlinedType6
+        type: Context
       attributes:
         docs: The attributes of the event
-        type: optional<_InlinedType8>
+        type: optional<Attributes>
       payload:
         docs: Payload of the event
         type: map<string, unknown>
@@ -243,7 +266,7 @@ types:
         docs: The actor (user or system) who acknowledged the event
         type: optional<string>
 
-  _InlinedType5:
+  Domain:
     docs: The domain of the event
     enum:
       - file
@@ -251,7 +274,7 @@ types:
       - workbook
       - job
 
-  _InlinedType6:
+  Context:
     docs: The context of the event
     properties:
       actionName: optional<ActionName>
@@ -266,7 +289,7 @@ types:
       fileId: optional<FileId>
       precedingEventId: optional<EventId>
 
-  _InlinedType7:
+  Progress:
     docs: The progress of the event within a collection of iterable events
     properties:
       current:
@@ -279,12 +302,12 @@ types:
         docs: The percent complete of the event group
         type: optional<integer>
 
-  _InlinedType8:
+  Attributes:
     docs: The attributes of the event
     properties:
       progress:
         docs: The progress of the event within a collection of iterable events
-        type: optional<_InlinedType7>
+        type: optional<Progress>
 
   ActionName:
     docs: Name of an action
@@ -315,42 +338,43 @@ types:
     properties:
       type:
         docs: The type of job
-        type: _InlinedType9
+        type: JobType
       operation:
         docs: the type of operation to perform on the data
-        type: optional<_InlinedType10>
+        type: optional<Operation>
       source: FileOrWorkbookId
       destination: optional<WorkbookId>
       trigger:
         docs: the type of trigger to use for this job
-        type: optional<_InlinedType11>
+        type: optional<Trigger>
       status:
         docs: the status of the job
-        type: optional<_InlinedType12>
+        type: optional<JobStatus>
       progress:
         docs: the progress of the job
         type: optional<double>
 
-  _InlinedType9:
+  JobType:
     docs: The type of job
     enum:
       - file
       - workbook
 
-  _InlinedType10:
+  Operation:
     docs: the type of operation to perform on the data
     enum:
       - extract
       - map
-      - delete-records
+      - value: delete-records
+        name: delete_records
 
-  _InlinedType11:
+  Trigger:
     docs: the type of trigger to use for this job
     enum:
       - manual
       - immediate
 
-  _InlinedType12:
+  JobStatus:
     docs: the status of the job
     enum:
       - planning
@@ -388,9 +412,9 @@ types:
     properties:
       driver:
         docs: The driver to use for extracting data from the file
-        type: _InlinedType13
+        type: Driver
 
-  _InlinedType13:
+  Driver:
     docs: The driver to use for extracting data from the file
     enum:
       - csv
@@ -411,40 +435,40 @@ types:
       The execution plan for a job, for example, for a map job, the execution
       plan is the mapping of the source sheet to the destination sheet.
     properties:
-      fieldMapping: optional<list<_InlinedType18>>
-      unmappedSourceFields: optional<list<_InlinedType19>>
-      unmappedDestinationFields: optional<list<_InlinedType22>>
+      fieldMapping: optional<list<FieldMapping>>
+      unmappedSourceFields: optional<list<UnmappedSourceField>>
+      unmappedDestinationFields: optional<list<UnmappedDestinationField>>
       headerRowCount:
         docs: The number of rows to skip before reading data from the document
         type: optional<integer>
 
-  _InlinedType14:
+  CategoryMapping:
     properties:
       sourceValue: optional<string>
       destinationValue: optional<string>
 
-  _InlinedType15:
+  EnumDetails:
     docs: >-
       Only available if one or more of the destination fields is of type enum.
       Provides category mapping.
     properties:
-      mapping: optional<list<_InlinedType14>>
+      mapping: optional<list<CategoryMapping>>
       unusedSourceValues: optional<list<string>>
       unusedDestinationValues: optional<list<string>>
 
-  _InlinedType16:
+  Certainty:
     enum:
       - absolute
       - strong
       - moderate
       - weak
 
-  _InlinedType17:
+  Metadata:
     properties:
-      certainty: optional<_InlinedType16>
+      certainty: optional<Certainty>
       source: optional<string>
 
-  _InlinedType18:
+  FieldMapping:
     properties:
       sourceField: Properties_Property
       destinationField: Properties_Property
@@ -453,35 +477,21 @@ types:
         docs: >-
           Only available if one or more of the destination fields is of type
           enum. Provides category mapping.
-        type: optional<_InlinedType15>
-      metadata: optional<_InlinedType17>
+        type: optional<EnumDetails>
+      metadata: optional<Metadata>
 
-  _InlinedType19:
+  UnmappedSourceField:
     properties:
       sourceField: Properties_Property
       preview: optional<list<string>>
 
-  _InlinedType20:
-    properties:
-      sourceValue: optional<string>
-      destinationValue: optional<string>
-
-  _InlinedType21:
-    docs: >-
-      Only available if one or more of the destination fields is of type enum.
-      Provides category mapping.
-    properties:
-      mapping: optional<list<_InlinedType20>>
-      unusedSourceValues: optional<list<string>>
-      unusedDestinationValues: optional<list<string>>
-
-  _InlinedType22:
+  UnmappedDestinationField:
     properties:
       enumDetails:
         docs: >-
           Only available if one or more of the destination fields is of type
           enum. Provides category mapping.
-        type: optional<_InlinedType21>
+        type: optional<EnumDetails>
       destinationField: Properties_Property
       preview: optional<list<string>>
 
@@ -530,14 +540,14 @@ types:
   Properties_BaseProperty:
     properties:
       key: string
-      type: optional<_InlinedType25>
+      type: optional<Type>
       label:
         docs: User friendly field name
         type: optional<string>
       description: optional<string>
       constraints: optional<list<Properties_Constraint>>
 
-  _InlinedType25:
+  Type:
     enum:
       - string
       - number
@@ -557,9 +567,9 @@ types:
 
   Properties_BaseConstraint:
     properties:
-      type: _InlinedType28
+      type: BaseConstraintType
 
-  _InlinedType28:
+  BaseConstraintType:
     enum:
       - required
       - unique
@@ -568,31 +578,31 @@ types:
   Properties_UniqueConstraint:
     extends:
       - Properties_BaseConstraint
-      - _InlinedType29
+      - UniqueConstraint
 
-  _InlinedType29:
+  UniqueConstraint:
     properties:
-      type: _InlinedType30
+      type: Type
       config: optional<_InlinedType31>
 
   Properties_ComputedConstraint:
     extends:
       - Properties_BaseConstraint
-      - _InlinedType32
+      - ComputedConstraint
 
-  _InlinedType32:
+  ComputedConstraint:
     properties:
-      type: optional<_InlinedType33>
+      type: optional<Type>
 
   Properties_NumberProperty:
     extends:
       - Properties_BaseProperty
       - Properties_ArrayableProperty
-      - _InlinedType34
+      - NumberProperty
 
-  _InlinedType34:
+  NumberProperty:
     properties:
-      type: optional<_InlinedType35>
+      type: optional<Type>
       config:
         docs: Optional configuration
         type: optional<_InlinedType36>
@@ -606,9 +616,9 @@ types:
   Properties_BooleanProperty:
     extends:
       - Properties_BaseProperty
-      - _InlinedType37
+      - BooleanProperty
 
-  _InlinedType37:
+  BooleanProperty:
     properties:
       type: optional<_InlinedType38>
       config: optional<_InlinedType39>
@@ -616,22 +626,22 @@ types:
   Properties_DateProperty:
     extends:
       - Properties_BaseProperty
-      - _InlinedType40
+      - DateProperty
 
-  _InlinedType40:
+  DateProperty:
     properties:
-      type: optional<_InlinedType41>
+      type: optional<Type>
 
   Properties_EnumProperty:
     extends:
       - Properties_BaseProperty
       - Properties_ArrayableProperty
-      - _InlinedType42
+      - EnumProperty
 
-  _InlinedType42:
+  EnumProperty:
     properties:
-      type: optional<_InlinedType43>
-      config: _InlinedType44
+      type: optional<Type>
+      config: Config
 
   Properties_EnumPropertyOption:
     properties:
@@ -654,12 +664,12 @@ types:
     extends:
       - Properties_BaseProperty
       - Properties_ArrayableProperty
-      - _InlinedType45
+      - ReferenceProperty
 
-  _InlinedType45:
+  ReferenceProperty:
     properties:
-      type: optional<_InlinedType46>
-      config: _InlinedType48
+      type: optional<Type>
+      config: Config
 
   Properties_Action:
     properties:
@@ -668,9 +678,9 @@ types:
       type: optional<string>
       description: optional<string>
 
-  Space:
+  SpaceData:
     properties:
-      data: optional<Space>
+      data: optional<SpaceData>
 
   SpaceConfig:
     docs: Properties used to create a new Space
@@ -684,15 +694,15 @@ types:
       displayOrder:
         docs: The display order
         type: optional<integer>
-      sidebarConfigs: optional<list<SidebarConfig>>
+      sidebarConfigs: optional<list<WorkbookSidebarConfig>>
       actions: optional<list<Properties_Action>>
 
   WorkbookSidebarConfig:
     extends:
       - BaseSideBarConfig
-      - _InlinedType49
+      - WorkbookConfig
 
-  _InlinedType49:
+  Workbook:
     properties:
       workbookId: WorkbookId
 
@@ -743,7 +753,7 @@ types:
       title: string
       body: string
 
-  Workbook:
+  WorkbookData:
     properties:
       data: optional<Workbook>
 
@@ -838,11 +848,15 @@ types:
 
   _InlinedType55:
     enum:
-      - required-constraint
-      - unique-constraint
-      - custom-logic
+      - value: required-constraint
+        name: required_constraint
+      - value: unique-constraint
+        name: unique_constraint
+      - value: custom-logic
+        name: custom_logic
       - unlinked
-      - invalid-option
+      - value: invalid-option
+        name: invalid_option
 
   RecordCounts:
     properties:
