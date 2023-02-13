@@ -9,37 +9,7 @@ service:
   path-parameters:
     environmentId: string
   endpoints:
-    getAgents:
-      path: /agents
-      method: GET
-      display-name: List agents
-      response: Agents
-
-    createAgent:
-      path: /agents
-      method: POST
-      display-name: Create an agent
-      request:
-        body: "#/components/requestBodies/Agent"
-      response: commons.Agent
-
-    getAgent:
-      path: /agents/{agentId}
-      method: GET
-      display-name: Get an agent
-      path-parameters:
-        agentId: string
-      response: commons.Agent
-
-    getAgentLogs:
-      path: /agents/{agentId}/logs
-      method: GET
-      display-name: Get logs for an agent
-      path-parameters:
-        agentId: string
-      response: commons.AgentLogs
-
-    getEvents:
+    getAll:
       path: /events
       method: GET
       docs: |-
@@ -455,6 +425,7 @@ service:
         </table>
       display-name: List events
       request:
+        name: ListEventRequest
         query-parameters:
           spaceId: optional<string>
           domain:
@@ -477,14 +448,15 @@ service:
             type: optional<boolean>
       response: Events
 
-    createEvent:
+    create:
       path: /events
       method: POST
       display-name: Create an event
       request:
-        body: "#/components/requestBodies/Event"
+        name: CreateEventRequest
+        body: commons.Event
 
-    getEvent:
+    get:
       path: /events/{eventId}
       method: GET
       display-name: Get an event
@@ -494,7 +466,7 @@ service:
           type: string
       response: commons.Event
 
-    ackEvent:
+    ack:
       path: /events/{eventId}/ack
       method: POST
       display-name: Acknowledge an event
@@ -503,12 +475,8 @@ service:
           docs: The event id
           type: string
       response: commons.Success
-
+  
 types:
-  Agents:
-    properties:
-      data: optional<list<commons.Agent>>
-
   Events:
     properties:
       data: optional<list<commons.Event>>

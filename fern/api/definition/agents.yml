@@ -1,0 +1,46 @@
+# yaml-language-server: $schema=https://raw.githubusercontent.com/fern-api/fern/main/fern.schema.json
+
+imports:
+  commons: commons.yml
+
+service:
+  auth: false
+  base-path: /environments/{environmentId}
+  path-parameters:
+    environmentId: string
+  endpoints:
+    getAll:
+      path: /agents
+      method: GET
+      display-name: List agents
+      response: Agents
+
+    create:
+      path: /agents
+      method: POST
+      display-name: Create an agent
+      request:
+        name: CreateAgentRequest
+        body: commons.Agent
+      response: commons.Agent
+
+    get:
+      path: /agents/{agentId}
+      method: GET
+      display-name: Get an agent
+      path-parameters:
+        agentId: string
+      response: commons.Agent
+
+    getAgentLogs:
+      path: /agents/{agentId}/logs
+      method: GET
+      display-name: Get logs for an agent
+      path-parameters:
+        agentId: string
+      response: commons.AgentLogs
+
+types:
+  Agents:
+    properties:
+      data: optional<list<commons.Agent>>

@@ -7,23 +7,24 @@ service:
   auth: false
   base-path: /environments
   endpoints:
-    getEnvironments:
+    getAll:
       path: ""
       method: GET
       docs: Get all environments
       display-name: List environments
       response: Environments
 
-    createEnvironment:
+    create:
       path: ""
       method: POST
       docs: Create a new environment
       display-name: Create an environment
       request:
-        body: commons.#/components/requestBodies/Environment
+        name: CreateEnvironmentRequest
+        body: commons.Environment
       response: commons.Environment
 
-    getEnvironmentById:
+    get:
       path: /{environmentId}
       method: GET
       docs: Returns a single environment
@@ -34,7 +35,7 @@ service:
           type: string
       response: commons.Environment
 
-    updateEnvironmentById:
+    update:
       path: /{environmentId}
       method: PATCH
       docs: Updates a single environment, to change the name for example
@@ -44,7 +45,8 @@ service:
           docs: ID of the environment to update
           type: string
       request:
-        body: commons.#/components/requestBodies/Environment
+        name: UpdateEnvironmentRequest
+        body: commons.Environment
       response: commons.Environment
 
     getAllAgentLogs:
@@ -54,6 +56,7 @@ service:
       path-parameters:
         environmentId: string
       request:
+        name: GetAllAgentLogsRequest
         query-parameters:
           pageSize:
             docs: Number of logs to return in a page (default 20)

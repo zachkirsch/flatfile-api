@@ -7,11 +7,12 @@ service:
   auth: false
   base-path: /jobs
   endpoints:
-    getJobs:
+    getAll:
       path: ""
       method: GET
       display-name: List jobs
       request:
+        name: GetJobsRequest
         query-parameters:
           environmentId: optional<string>
           spaceId: optional<string>
@@ -19,15 +20,16 @@ service:
           fileId: optional<string>
       response: Jobs
 
-    createJob:
+    create:
       path: ""
       method: POST
       display-name: Create a job
       request:
-        body: "#/components/requestBodies/Job"
+        name: CreatJobRequest
+        body: commons.Job
       response: commons.Job
 
-    getJob:
+    get:
       path: /{jobId}
       method: GET
       display-name: Get a job
@@ -35,7 +37,7 @@ service:
         jobId: string
       response: commons.Job
 
-    deleteJob:
+    delete:
       path: /{jobId}
       method: DELETE
       display-name: Delete a job
@@ -43,7 +45,7 @@ service:
         jobId: string
       response: commons.Success
 
-    getJobExecutionPlan:
+    getExecutionPlan:
       path: /{jobId}/plan
       method: GET
       docs: Returns a single job's execution plan
@@ -52,9 +54,9 @@ service:
         jobId:
           docs: ID of job to return
           type: string
-      response: JobPlan
+      response: JobPlanObject
 
-    updateJobExecutionPlanById:
+    updateExecutionPlan:
       path: /{jobId}/plan
       method: PUT
       docs: Update a job's entire execution plan
@@ -64,9 +66,10 @@ service:
           docs: ID of job to return
           type: string
       request:
-        body: commons.#/components/requestBodies/Plan
+        name: UpdateJobExecutionPlanRequest
+        body: commons.Plan
 
-    updateJobExecutionPlanFields:
+    updateExecutionPlanFields:
       path: /{jobId}/plan
       method: PATCH
       docs: Update a one or more individual fields on a job's execution plan
@@ -76,7 +79,8 @@ service:
           docs: ID of job to return
           type: string
       request:
-        body: commons.#/components/requestBodies/Plan
+        name: UpdateExecutionPlanFieldsRequest
+        body: commons.Plan
 
     executeJob:
       path: /{jobId}/execute
@@ -93,6 +97,6 @@ types:
     properties:
       data: optional<list<commons.Job>>
 
-  JobPlan:
+  JobPlanObject:
     properties:
       data: optional<commons.JobPlan>

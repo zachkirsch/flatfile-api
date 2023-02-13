@@ -13,7 +13,8 @@ service:
       docs: Authenticate a specific user via unique email and password.
       display-name: Authenticate a user
       request:
-        body: "#/components/requestBodies/Credentials"
+        name: AuthenticateUserRequest
+        body: Credentials
       response: commons.AccessToken
 
     getAccessToken:
@@ -25,5 +26,22 @@ service:
         via SDK or scripting.
       display-name: Authenticate with secret and clientId
       request:
-        body: "#/components/requestBodies/AccessTokenCredentials"
+        name: GetAccessTokenRequest
+        body: AccessTokenCredentials
       response: commons.AccessToken
+
+types:
+  Credentials: 
+    docs: Credentials to authenticate a user 
+    properties:
+      email: string 
+      password: string 
+    
+  AccessTokenCredentials:
+    properties:
+      clientId: 
+        type: string 
+        docs: Client ID generated for auth 
+      secret: 
+        type: string 
+        docs: Secret generated for auth 
