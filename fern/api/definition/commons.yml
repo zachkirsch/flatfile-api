@@ -9,8 +9,10 @@ types:
       expires: string
 
   User:
+    docs: Configurations for the user
+    extends: UserConfig 
     properties:
-      data: optional<User>
+      id: UserId
 
   UserId:
     docs: User ID
@@ -55,7 +57,7 @@ types:
 
   Guest:
     properties:
-      data: optional<Guest>
+      data: optional<GuestConfig>
 
   GuestId:
     docs: Guest ID
@@ -85,14 +87,47 @@ types:
 
   File:
     properties:
-      data: File
+      data: FileData 
+
+  FileData: 
+    docs: Any uploaded file of any type
+    properties:
+      id: FileId 
+      name:
+        docs: Original filename
+        type: string
+      ext:
+        docs: Extension of the file
+        type: string
+      mimetype:
+        docs: MIME Type of the file
+        type: string
+      encoding:
+        docs: Text encoding of the file
+        type: string
+      status:
+        docs: Status of the file 
+        type: ModelFileStatusEnum
+      size:
+        docs: Size of file in bytes
+        type: integer
+      bytesReceived:
+        docs: Number of bytes that have been uploaded so far (useful for progress tracking)
+        type: integer
+      spaceId: SpaceId 
+      workbookId: WorkbookId
+      createdAt:
+        docs: Date the file was created
+        type: string
+      updatedAt:
+        docs: Date the file was last updated
+        type: string
 
   FileId:
     docs: File ID
     type: string
 
   ModelFileStatusEnum:
-    docs: Status of the file
     enum:
       - partial
       - complete
@@ -109,7 +144,7 @@ types:
 
   Environment:
     properties:
-      data: optional<Environment>
+      data: optional<EnvironmentConfig>
 
   EnvironmentConfig:
     docs: Properties used to create a new environment
@@ -156,7 +191,7 @@ types:
 
   Agent:
     properties:
-      data: optional<Agent>
+      data: optional<AgentConfig>
 
   AgentId:
     docs: Agent ID
@@ -232,7 +267,7 @@ types:
 
   Event:
     properties:
-      data: optional<Event>
+      data: optional<EventConfig>
 
   EventConfig:
     docs: Properties used to create a new event
@@ -435,9 +470,11 @@ types:
       The execution plan for a job, for example, for a map job, the execution
       plan is the mapping of the source sheet to the destination sheet.
     properties:
-      fieldMapping: optional<list<FieldMapping>>
-      unmappedSourceFields: optional<list<UnmappedSourceField>>
-      unmappedDestinationFields: optional<list<UnmappedDestinationField>>
+      fieldMapping: 
+        type: optional<list<FieldMapping>>
+        docs: Edges 
+      unmappedSourceFields: optional<list<SourceField>>
+      unmappedDestinationFields: optional<list<DestinationField>>
       headerRowCount:
         docs: The number of rows to skip before reading data from the document
         type: optional<integer>
@@ -469,9 +506,10 @@ types:
       source: optional<string>
 
   FieldMapping:
+    docs: Edge 
     properties:
-      sourceField: Properties_Property
-      destinationField: Properties_Property
+      sourceField: Property
+      destinationField: Property
       preview: optional<list<string>>
       enumDetails:
         docs: >-
@@ -480,170 +518,77 @@ types:
         type: optional<EnumDetails>
       metadata: optional<Metadata>
 
-  UnmappedSourceField:
+  SourceField:
     properties:
-      sourceField: Properties_Property
+      sourceField: Property
       preview: optional<list<string>>
 
-  UnmappedDestinationField:
+  DestinationField:
     properties:
       enumDetails:
         docs: >-
           Only available if one or more of the destination fields is of type
           enum. Provides category mapping.
         type: optional<EnumDetails>
-      destinationField: Properties_Property
+      destinationField: Property
       preview: optional<list<string>>
 
-  SpacePattern:
-    properties:
-      data: optional<SpacePattern>
-
-  SpaceConfigId:
-    docs: Space Config ID
-    type: string
-
-  SpacePatternConfig:
-    docs: Properties used to create a new Space Config
-    properties:
-      slug: string
-      name: string
-      blueprints: list<Blueprint>
-      actions: optional<list<Properties_Action>>
-
-  Blueprint:
-    docs: Properties used to create a new Blueprint
-    properties:
-      slug: string
-      name: string
-      primary: optional<boolean>
-      sheets: list<SheetConfig>
-
-  SheetConfig:
-    docs: Describes shape of data as well as behavior
-    properties:
-      name: string
-      description: optional<string>
-      slug: optional<string>
-      fields: list<Properties_Property>
-      actions: optional<list<Properties_Action>>
-
-  Properties_StringProperty:
-    extends:
-      - Properties_BaseProperty
-      - _InlinedType23
-
-  _InlinedType23:
-    properties:
-      type: optional<_InlinedType24>
-
-  Properties_BaseProperty:
-    properties:
-      key: string
-      type: optional<Type>
-      label:
-        docs: User friendly field name
-        type: optional<string>
-      description: optional<string>
-      constraints: optional<list<Properties_Constraint>>
-
-  Type:
-    enum:
-      - string
-      - number
-      - boolean
-      - date
-      - enum
-      - reference
-
-  Properties_RequiredConstraint:
-    extends:
-      - Properties_BaseConstraint
-      - _InlinedType26
-
-  _InlinedType26:
-    properties:
-      type: optional<_InlinedType27>
-
-  Properties_BaseConstraint:
-    properties:
-      type: BaseConstraintType
-
-  BaseConstraintType:
-    enum:
-      - required
-      - unique
-      - computed
-
-  Properties_UniqueConstraint:
-    extends:
-      - Properties_BaseConstraint
-      - UniqueConstraint
-
-  UniqueConstraint:
-    properties:
-      type: Type
-      config: optional<_InlinedType31>
-
-  Properties_ComputedConstraint:
-    extends:
-      - Properties_BaseConstraint
-      - ComputedConstraint
-
-  ComputedConstraint:
-    properties:
-      type: optional<Type>
-
-  Properties_NumberProperty:
-    extends:
-      - Properties_BaseProperty
-      - Properties_ArrayableProperty
-      - NumberProperty
-
   NumberProperty:
+    extends:
+      - BaseProperty
+      - ArrayableProperty
     properties:
-      type: optional<Type>
       config:
         docs: Optional configuration
-        type: optional<_InlinedType36>
+        type: optional<NumberConfig>
 
-  Properties_ArrayableProperty:
+  NumberConfig: 
+    docs: Optional configuration 
+    properties:
+      decimal_places: 
+        docs: Number of decimal places to round data to
+        type: integer
+
+  ArrayableProperty:
     properties:
       is_array:
         docs: Will allow multiple values and store as an array
         type: optional<boolean>
 
-  Properties_BooleanProperty:
-    extends:
-      - Properties_BaseProperty
-      - BooleanProperty
-
   BooleanProperty:
+    extends: BaseProperty
     properties:
-      type: optional<_InlinedType38>
-      config: optional<_InlinedType39>
+      config: optional<BooleanPropertyConfig>
 
-  Properties_DateProperty:
-    extends:
-      - Properties_BaseProperty
-      - DateProperty
+  BooleanPropertyConfig: 
+    properties:
+      allow_indeterminate:
+        type: boolean
+        docs: Allow a neither true or false state to be stored as `null`
 
   DateProperty:
-    properties:
-      type: optional<Type>
-
-  Properties_EnumProperty:
     extends:
-      - Properties_BaseProperty
-      - Properties_ArrayableProperty
-      - EnumProperty
+      - BaseProperty
+
+  StringProperty:
+    extends:
+      - BaseProperty
 
   EnumProperty:
+    extends:
+      - BaseProperty
+      - ArrayableProperty
     properties:
-      type: optional<Type>
-      config: Config
+      config: EnumPropertyConfig
 
-  Properties_EnumPropertyOption:
+  EnumPropertyConfig:
+    properties:
+      allow_custom: 
+        type: boolean
+        docs: Permit the user to create new options for this specific field.
+      options: list<EnumPropertyOption>
+
+  EnumPropertyOption:
     properties:
       label:
         docs: A visual label for this option, defaults to value if not provided
@@ -660,233 +605,317 @@ types:
           available to hooks
         type: optional<map<string, unknown>>
 
-  Properties_ReferenceProperty:
-    extends:
-      - Properties_BaseProperty
-      - Properties_ArrayableProperty
-      - ReferenceProperty
-
   ReferenceProperty:
+    extends:
+      - BaseProperty
+      - ArrayableProperty
     properties:
-      type: optional<Type>
-      config: Config
+      config: ReferencePropertyConfig
 
-  Properties_Action:
+  ReferencePropertyConfig: 
     properties:
-      slug: string
-      label: string
-      type: optional<string>
-      description: optional<string>
+      ref: 
+        type: string 
+        docs: Full path reference to a sheet configuration. Must be in the same workbook.
+      key: 
+        type: string 
+        docs: Key of the property to use as the reference key. Defaults to `id`
+      relationship: 
+        type: ReferencePropertyRelationship
+        docs: The type of relationship this defines
+    
+  ReferencePropertyRelationship: 
+    enum:
+      - value: has-one
+        name: has_one 
+      - value: has-many 
+        name: has_many
 
-  SpaceData:
-    properties:
-      data: optional<SpaceData>
+  # Properties_Action:
+  #   properties:
+  #     slug: string
+  #     label: string
+  #     type: optional<string>
+  #     description: optional<string>
 
-  SpaceConfig:
-    docs: Properties used to create a new Space
+  # SpaceData:
+  #   properties:
+  #     data: optional<SpaceData>
+
+  # SpaceConfig:
+  #   docs: Properties used to create a new Space
+  #   properties:
+  #     spaceConfigId: SpaceConfigId
+  #     environmentId: EnvironmentId
+  #     primaryWorkbookId: optional<WorkbookId>
+  #     name:
+  #       docs: The name of the space
+  #       type: optional<string>
+  #     displayOrder:
+  #       docs: The display order
+  #       type: optional<integer>
+  #     sidebarConfigs: optional<list<WorkbookSidebarConfig>>
+  #     actions: optional<list<Properties_Action>>
+
+  # WorkbookSidebarConfig:
+  #   extends:
+  #     - BaseSideBarConfig
+  #     - WorkbookConfig
+
+  # Workbook:
+  #   properties:
+  #     workbookId: WorkbookId
+
+  # BaseSideBarConfig:
+  #   properties:
+  #     type: optional<_InlinedType50>
+
+  # _InlinedType50:
+  #   enum:
+  #     - workbook
+  #     - document
+  #     - link
+
+  # DocumentSidebarConfig:
+  #   extends:
+  #     - BaseSideBarConfig
+  #     - _InlinedType51
+
+  # _InlinedType51:
+  #   properties:
+  #     documentId: DocumentId
+
+  # DocumentId:
+  #   docs: Document ID
+  #   type: string
+
+  # LinkSidebarConfig:
+  #   extends:
+  #     - BaseSideBarConfig
+  #     - _InlinedType52
+
+  # _InlinedType52:
+  #   properties:
+  #     href:
+  #       docs: http url of the link
+  #       type: string
+  #     title:
+  #       docs: Space the file should be uploaded to
+  #       type: string
+
+  # Document:
+  #   properties:
+  #     data: optional<Document>
+
+  # DocumentConfig:
+  #   docs: Properties used to create a new document
+  #   properties:
+  #     title: string
+  #     body: string
+
+  # WorkbookData:
+  #   properties:
+  #     data: optional<Workbook>
+
+  # Sheet:
+  #   docs: A place to store tabular data
+  #   properties:
+  #     id: SheetId
+  #     name: string
+  #     config: optional<SheetConfig>
+
+  # WorkbookConfig:
+  #   docs: Properties used to create a new Workbook
+  #   properties:
+  #     name: string
+  #     labels: optional<list<string>>
+  #     spaceId: SpaceId
+  #     environmentId: EnvironmentId
+  #     sheets: optional<list<SheetConfig>>
+  #     actions: optional<list<Properties_Action>>
+
+  # RecordsResponse:
+  #   properties:
+  #     data: optional<RecordsResponseData>
+
+  # RecordsResponseData:
+  #   docs: A list of records with optional record counts
+  #   extends:
+  #     - Success
+  #     - _InlinedType53
+
+  # _InlinedType53:
+  #   properties:
+  #     records: optional<RecordsWithLinks>
+  #     counts: optional<RecordCounts>
+  #     versionId: optional<VersionId>
+
+  # RecordsWithLinks:
+  #   docs: List of Record objects, including links to related rows
+  #   type: list<RecordWithLinks>
+
+  # RecordWithLinks:
+  #   docs: A single row of data in a Sheet, including links to related rows
+  #   properties:
+  #     id: RecordId
+  #     workbookId: WorkbookId
+  #     sheetId: SheetId
+  #     values: RecordDataWithLinks
+
+  # RecordDataWithLinks:
+  #   docs: A single row of data in a Sheet, including links to related rows
+  #   type: map<string, CellValueWithLinks>
+
+  # CellValueWithLinks:
+  #   extends:
+  #     - CellValue
+  #   properties:
+  #     links: optional<Records>
+
+  # Records:
+  #   docs: List of Record objects
+  #   type: list<Record>
+
+  # Record:
+  #   docs: A single row of data in a Sheet
+  #   properties:
+  #     id: RecordId
+  #     workbookId: WorkbookId
+  #     sheetId: SheetId
+  #     values: RecordData
+
+  # RecordData:
+  #   docs: A single row of data in a Sheet
+  #   type: map<string, CellValue>
+
+  # CellValue:
+  #   properties:
+  #     valid: optional<boolean>
+  #     messages: optional<list<ValidationMessage>>
+
+  # ValidationMessage:
+  #   docs: Record data validation messages
+  #   properties:
+  #     type: optional<_InlinedType54>
+  #     source: optional<_InlinedType55>
+  #     message: optional<string>
+
+  # _InlinedType54:
+  #   enum:
+  #     - error
+  #     - warn
+  #     - info
+
+  # _InlinedType55:
+  #   enum:
+  #     - value: required-constraint
+  #       name: required_constraint
+  #     - value: unique-constraint
+  #       name: unique_constraint
+  #     - value: custom-logic
+  #       name: custom_logic
+  #     - unlinked
+  #     - value: invalid-option
+  #       name: invalid_option
+
+  # RecordCounts:
+  #   properties:
+  #     total: optional<double>
+  #     valid: optional<double>
+  #     error: optional<double>
+
+  # Fields:
+  #   properties:
+  #     data: optional<FieldResponse>
+
+  # FieldResponse:
+  #   docs: A field with one or many records
+  #   type: map<string, FieldsData>
+
+  # FieldsData:
+  #   docs: Array of field data
+  #   type: list<FieldData>
+
+  # FieldData:
+  #   docs: A single field of data in a Sheet
+  #   extends:
+  #     - _InlinedType56
+  #     - CellValue
+  #     - _InlinedType57
+
+  # _InlinedType56:
+  #   properties:
+  #     id: optional<RecordId>
+
+  # _InlinedType57:
+  #   properties:
+  #     counts: optional<RecordCounts>
+
+  BaseProperty:
     properties:
-      spaceConfigId: SpaceConfigId
-      environmentId: EnvironmentId
-      primaryWorkbookId: optional<WorkbookId>
-      name:
-        docs: The name of the space
+      key: string 
+      label: 
         type: optional<string>
-      displayOrder:
-        docs: The display order
-        type: optional<integer>
-      sidebarConfigs: optional<list<WorkbookSidebarConfig>>
-      actions: optional<list<Properties_Action>>
+        docs: User friendly field name
+      description: optional<string>
+      constraints: list<Constraint>
 
-  WorkbookSidebarConfig:
-    extends:
-      - BaseSideBarConfig
-      - WorkbookConfig
+  Property:
+    union:
+      string: StringProperty 
+      number: NumberProperty 
+      boolean: BooleanProperty 
+      date: DateProperty 
+      enum: EnumProperty 
+      reference: ReferenceProperty 
 
-  Workbook:
-    properties:
-      workbookId: WorkbookId
+  Constraint: 
+    union:
+      required: RequiredConstraint 
+      unique: UniqueConstraint 
+      computed: ComputedConstraint 
 
-  BaseSideBarConfig:
-    properties:
-      type: optional<_InlinedType50>
-
-  _InlinedType50:
+  RequiredConstraint: 
     enum:
-      - workbook
-      - document
-      - link
+      - required
 
-  DocumentSidebarConfig:
-    extends:
-      - BaseSideBarConfig
-      - _InlinedType51
-
-  _InlinedType51:
-    properties:
-      documentId: DocumentId
-
-  DocumentId:
-    docs: Document ID
-    type: string
-
-  LinkSidebarConfig:
-    extends:
-      - BaseSideBarConfig
-      - _InlinedType52
-
-  _InlinedType52:
-    properties:
-      href:
-        docs: http url of the link
-        type: string
-      title:
-        docs: Space the file should be uploaded to
-        type: string
-
-  Document:
-    properties:
-      data: optional<Document>
-
-  DocumentConfig:
-    docs: Properties used to create a new document
-    properties:
-      title: string
-      body: string
-
-  WorkbookData:
-    properties:
-      data: optional<Workbook>
-
-  Sheet:
-    docs: A place to store tabular data
-    properties:
-      id: SheetId
-      name: string
-      config: optional<SheetConfig>
-
-  WorkbookConfig:
-    docs: Properties used to create a new Workbook
-    properties:
-      name: string
-      labels: optional<list<string>>
-      spaceId: SpaceId
-      environmentId: EnvironmentId
-      sheets: optional<list<SheetConfig>>
-      actions: optional<list<Properties_Action>>
-
-  RecordsResponse:
-    properties:
-      data: optional<RecordsResponseData>
-
-  RecordsResponseData:
-    docs: A list of records with optional record counts
-    extends:
-      - Success
-      - _InlinedType53
-
-  _InlinedType53:
-    properties:
-      records: optional<RecordsWithLinks>
-      counts: optional<RecordCounts>
-      versionId: optional<VersionId>
-
-  RecordsWithLinks:
-    docs: List of Record objects, including links to related rows
-    type: list<RecordWithLinks>
-
-  RecordWithLinks:
-    docs: A single row of data in a Sheet, including links to related rows
-    properties:
-      id: RecordId
-      workbookId: WorkbookId
-      sheetId: SheetId
-      values: RecordDataWithLinks
-
-  RecordDataWithLinks:
-    docs: A single row of data in a Sheet, including links to related rows
-    type: map<string, CellValueWithLinks>
-
-  CellValueWithLinks:
-    extends:
-      - CellValue
-    properties:
-      links: optional<Records>
-
-  Records:
-    docs: List of Record objects
-    type: list<Record>
-
-  Record:
-    docs: A single row of data in a Sheet
-    properties:
-      id: RecordId
-      workbookId: WorkbookId
-      sheetId: SheetId
-      values: RecordData
-
-  RecordData:
-    docs: A single row of data in a Sheet
-    type: map<string, CellValue>
-
-  CellValue:
-    properties:
-      valid: optional<boolean>
-      messages: optional<list<ValidationMessage>>
-
-  ValidationMessage:
-    docs: Record data validation messages
-    properties:
-      type: optional<_InlinedType54>
-      source: optional<_InlinedType55>
-      message: optional<string>
-
-  _InlinedType54:
+  UniqueConstraint: 
     enum:
-      - error
-      - warn
-      - info
+      - unique
 
-  _InlinedType55:
+  ComputedConstraint: 
     enum:
-      - value: required-constraint
-        name: required_constraint
-      - value: unique-constraint
-        name: unique_constraint
-      - value: custom-logic
-        name: custom_logic
-      - unlinked
-      - value: invalid-option
-        name: invalid_option
+      - computed
 
-  RecordCounts:
-    properties:
-      total: optional<double>
-      valid: optional<double>
-      error: optional<double>
+  # SpacePattern:
+  #   properties:
+  #     data: optional<SpaceConfigId>
 
-  Fields:
-    properties:
-      data: optional<FieldResponse>
+  # SpaceConfigId:
+  #   docs: Space Config ID
+  #   type: string
 
-  FieldResponse:
-    docs: A field with one or many records
-    type: map<string, FieldsData>
+  # SpacePatternConfig:
+  #   docs: Properties used to create a new Space Config
+  #   properties:
+  #     slug: string
+  #     name: string
+  #     blueprints: list<Blueprint>
+  #     actions: optional<list<Properties_Action>>
 
-  FieldsData:
-    docs: Array of field data
-    type: list<FieldData>
+  # Blueprint:
+  #   docs: Properties used to create a new Blueprint
+  #   properties:
+  #     slug: string
+  #     name: string
+  #     primary: optional<boolean>
+  #     sheets: list<SheetConfig>
 
-  FieldData:
-    docs: A single field of data in a Sheet
-    extends:
-      - _InlinedType56
-      - CellValue
-      - _InlinedType57
-
-  _InlinedType56:
-    properties:
-      id: optional<RecordId>
-
-  _InlinedType57:
-    properties:
-      counts: optional<RecordCounts>
+  # SheetConfig:
+  #   docs: Describes shape of data as well as behavior
+  #   properties:
+  #     name: string
+  #     description: optional<string>
+  #     slug: optional<string>
+  #     fields: list<Properties_Property>
+  #     actions: optional<list<Properties_Action>>
