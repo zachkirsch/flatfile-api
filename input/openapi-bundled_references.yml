@@ -1,0 +1,4234 @@
+openapi: 3.0.0
+servers:
+  - url: 'https://api.x.flatfile.com/v1'
+info:
+  description: ''
+  version: 1.0.0
+  title: flatfile/api
+tags:
+  - name: Auth
+    description: Manage authentication in Flatfile.
+  - name: Environments
+    description: 'Manage environments, the starting place for every Flatfile integration.'
+  - name: Users & Guests
+    description: Manage users within an account and guests within an environment.
+  - name: Agents & Events
+    description: Manage agents and events within your environment.
+  - name: Spaces & Documents
+    description: 'Manage spaces, and documents within those spaces.'
+  - name: Workbooks & Sheets
+    description: Manage workbooks and sheets within a space.
+  - name: Files
+    description: Manage files within a space.
+  - name: Jobs
+    description: 'Manage jobs for a space, workbook, or file.'
+paths:
+  /auth:
+    post:
+      tags:
+        - Auth
+      operationId: authenticate
+      summary: Authenticate a user
+      description: Authenticate a specific user via unique email and password.
+      requestBody:
+        $ref: '#/components/requestBodies/Credentials'
+      responses:
+        '200':
+          $ref: '#/components/responses/AccessToken'
+        '400':
+          $ref: '#/components/responses/Error'
+        '404':
+          $ref: '#/components/responses/Error'
+  /auth/access-token:
+    post:
+      tags:
+        - Auth
+      operationId: getAccessToken
+      summary: Authenticate with secret and clientId
+      description: 'The permissions are the same when using personal token or secret token; however, the secret token is recommended for programmatic access, i.e. via SDK or scripting.'
+      requestBody:
+        $ref: '#/components/requestBodies/AccessTokenCredentials'
+      responses:
+        '200':
+          $ref: '#/components/responses/AccessToken'
+        '400':
+          $ref: '#/components/responses/Error'
+        '404':
+          $ref: '#/components/responses/Error'
+  /users:
+    get:
+      tags:
+        - Users & Guests
+      security:
+        - BearerAuth: []
+      operationId: getUsers
+      summary: List users
+      description: Gets a list of users
+      responses:
+        '200':
+          $ref: '#/components/responses/Users'
+        '400':
+          $ref: '#/components/responses/Error'
+        '404':
+          $ref: '#/components/responses/Error'
+    post:
+      tags:
+        - Users & Guests
+      security:
+        - BearerAuth: []
+      operationId: createUser
+      summary: Create a user
+      description: A user is a privileged user that logs in with a username and password.
+      requestBody:
+        $ref: '#/components/requestBodies/User'
+      responses:
+        '200':
+          $ref: '#/components/responses/User'
+        '400':
+          $ref: '#/components/responses/Error'
+        '404':
+          $ref: '#/components/responses/Error'
+  '/users/{userId}':
+    get:
+      tags:
+        - Users & Guests
+      security:
+        - BearerAuth: []
+      operationId: getUser
+      summary: Get a user
+      description: Gets a user
+      parameters:
+        - in: path
+          name: userId
+          schema:
+            $ref: '#/components/schemas/UserId'
+          required: true
+          description: The user id
+      responses:
+        '200':
+          $ref: '#/components/responses/User'
+        '400':
+          $ref: '#/components/responses/Error'
+        '404':
+          $ref: '#/components/responses/Error'
+  '/users/{userId}/api-token':
+    post:
+      tags:
+        - Users & Guests
+      security:
+        - BearerAuth: []
+      operationId: createApiToken
+      summary: Create an API token
+      description: Creates an api token for authenticating against Flatfile APIs.
+      parameters:
+        - in: path
+          name: userId
+          required: true
+          schema:
+            $ref: '#/components/schemas/UserId'
+        - in: query
+          name: tenantId
+          required: true
+          schema:
+            type: string
+      responses:
+        '201':
+          $ref: '#/components/responses/ApiToken'
+        '400':
+          $ref: '#/components/responses/Error'
+        '404':
+          $ref: '#/components/responses/Error'
+    get:
+      tags:
+        - Users & Guests
+      security:
+        - BearerAuth: []
+      summary: List all tokens
+      description: Gets all the api tokens for a user.
+      operationId: getApiTokens
+      parameters:
+        - in: path
+          name: userId
+          required: true
+          schema:
+            $ref: '#/components/schemas/UserId'
+        - in: query
+          name: tenantId
+          required: true
+          schema:
+            type: string
+        - in: query
+          name: pageSize
+          schema:
+            type: integer
+          description: Number of tokens to return in a page (default 10)
+        - in: query
+          name: pageNumber
+          schema:
+            type: integer
+          description: 'Based on pageSize, which page of records to return'
+      responses:
+        '200':
+          $ref: '#/components/responses/ApiTokens'
+        '400':
+          $ref: '#/components/responses/Error'
+        '404':
+          $ref: '#/components/responses/Error'
+  /files:
+    get:
+      tags:
+        - Files
+      security:
+        - BearerAuth: []
+      operationId: getFiles
+      summary: List files
+      parameters:
+        - in: query
+          name: spaceId
+          schema:
+            $ref: '#/components/schemas/SpaceId'
+      responses:
+        '200':
+          $ref: '#/components/responses/Files'
+    post:
+      tags:
+        - Files
+      security:
+        - BearerAuth: []
+      operationId: createFile
+      summary: Upload a file
+      requestBody:
+        $ref: '#/components/requestBodies/UploadFile'
+      responses:
+        '200':
+          $ref: '#/components/responses/File'
+        '400':
+          $ref: '#/components/responses/Error'
+  '/files/{fileId}':
+    get:
+      tags:
+        - Files
+      security:
+        - BearerAuth: []
+      operationId: getFile
+      summary: Get a file
+      parameters:
+        - in: path
+          name: fileId
+          required: true
+          schema:
+            $ref: '#/components/schemas/FileId'
+      responses:
+        '200':
+          $ref: '#/components/responses/File'
+        '400':
+          $ref: '#/components/responses/Error'
+        '404':
+          $ref: '#/components/responses/Error'
+    patch:
+      tags:
+        - Files
+      operationId: updateFileById
+      summary: Update a File
+      description: 'Update a file, to change the workbook id for example'
+      security:
+        - BearerAuth: []
+      parameters:
+        - name: fileId
+          in: path
+          description: ID of file to update
+          required: true
+          schema:
+            $ref: '#/components/schemas/FileId'
+      requestBody:
+        $ref: '#/components/requestBodies/File'
+      responses:
+        '200':
+          $ref: '#/components/responses/File'
+        '400':
+          $ref: '#/components/responses/Error'
+        '404':
+          $ref: '#/components/responses/Error'
+    delete:
+      tags:
+        - Files
+      security:
+        - BearerAuth: []
+      operationId: deleteFile
+      summary: Delete a file
+      parameters:
+        - in: path
+          name: fileId
+          required: true
+          schema:
+            $ref: '#/components/schemas/FileId'
+      responses:
+        '200':
+          $ref: '#/components/responses/Success'
+        '400':
+          $ref: '#/components/responses/Error'
+        '404':
+          $ref: '#/components/responses/Error'
+  '/files/{fileId}/download':
+    get:
+      tags:
+        - Files
+      security:
+        - BearerAuth: []
+      operationId: downloadFile
+      summary: Download a file
+      parameters:
+        - in: path
+          name: fileId
+          required: true
+          schema:
+            $ref: '#/components/schemas/FileId'
+      responses:
+        '200':
+          $ref: '#/components/responses/DownloadFile'
+        '400':
+          $ref: '#/components/responses/Error'
+        '404':
+          $ref: '#/components/responses/Error'
+  /environments:
+    get:
+      tags:
+        - Environments
+      security:
+        - BearerAuth: []
+      operationId: getEnvironments
+      summary: List environments
+      description: Get all environments
+      responses:
+        '200':
+          $ref: '#/components/responses/Environments'
+    post:
+      tags:
+        - Environments
+      security:
+        - BearerAuth: []
+      operationId: createEnvironment
+      summary: Create an environment
+      description: Create a new environment
+      requestBody:
+        $ref: '#/components/requestBodies/Environment'
+      responses:
+        '200':
+          $ref: '#/components/responses/Environment'
+        '400':
+          $ref: '#/components/responses/Error'
+  '/environments/{environmentId}':
+    get:
+      tags:
+        - Environments
+      operationId: getEnvironmentById
+      summary: Get an environment
+      description: Returns a single environment
+      security:
+        - BearerAuth: []
+      parameters:
+        - name: environmentId
+          in: path
+          description: ID of the environment to return
+          required: true
+          schema:
+            $ref: '#/components/schemas/EnvironmentId'
+      responses:
+        '200':
+          $ref: '#/components/responses/Environment'
+        '400':
+          $ref: '#/components/responses/Error'
+        '404':
+          $ref: '#/components/responses/Error'
+    patch:
+      tags:
+        - Environments
+      operationId: updateEnvironmentById
+      summary: Update an environment
+      description: 'Updates a single environment, to change the name for example'
+      security:
+        - BearerAuth: []
+      parameters:
+        - name: environmentId
+          in: path
+          description: ID of the environment to update
+          required: true
+          schema:
+            $ref: '#/components/schemas/EnvironmentId'
+      requestBody:
+        $ref: '#/components/requestBodies/Environment'
+      responses:
+        '200':
+          $ref: '#/components/responses/Environment'
+        '400':
+          $ref: '#/components/responses/Error'
+        '404':
+          $ref: '#/components/responses/Error'
+  '/environments/{environmentId}/agents':
+    get:
+      tags:
+        - Agents & Events
+      security:
+        - BearerAuth: []
+      operationId: getAgents
+      summary: List agents
+      parameters:
+        - in: path
+          name: environmentId
+          required: true
+          schema:
+            $ref: '#/components/schemas/EnvironmentId'
+      responses:
+        '200':
+          $ref: '#/components/responses/Agents'
+    post:
+      tags:
+        - Agents & Events
+      security:
+        - BearerAuth: []
+      operationId: createAgent
+      summary: Create an agent
+      parameters:
+        - in: path
+          name: environmentId
+          required: true
+          schema:
+            $ref: '#/components/schemas/EnvironmentId'
+      requestBody:
+        $ref: '#/components/requestBodies/Agent'
+      responses:
+        '200':
+          $ref: '#/components/responses/Agent'
+        '400':
+          $ref: '#/components/responses/Error'
+  '/environments/{environmentId}/logs':
+    get:
+      tags:
+        - Environments
+      security:
+        - BearerAuth: []
+      operationId: getAllAgentLogs
+      summary: Get all agent logs for an environment
+      parameters:
+        - in: path
+          name: environmentId
+          required: true
+          schema:
+            $ref: '#/components/schemas/EnvironmentId'
+        - in: query
+          name: pageSize
+          schema:
+            type: integer
+          description: Number of logs to return in a page (default 20)
+        - in: query
+          name: pageNumber
+          schema:
+            type: integer
+          description: 'Based on pageSize, which page of records to return'
+      responses:
+        '200':
+          $ref: '#/components/responses/AgentLogs'
+        '400':
+          $ref: '#/components/responses/Error'
+        '404':
+          $ref: '#/components/responses/Error'
+  '/environments/{environmentId}/agents/{agentId}':
+    get:
+      tags:
+        - Agents & Events
+      security:
+        - BearerAuth: []
+      operationId: getAgent
+      summary: Get an agent
+      parameters:
+        - in: path
+          name: environmentId
+          required: true
+          schema:
+            $ref: '#/components/schemas/EnvironmentId'
+        - in: path
+          name: agentId
+          required: true
+          schema:
+            $ref: '#/components/schemas/AgentId'
+      responses:
+        '200':
+          $ref: '#/components/responses/Agent'
+        '400':
+          $ref: '#/components/responses/Error'
+        '404':
+          $ref: '#/components/responses/Error'
+  '/environments/{environmentId}/agents/{agentId}/logs':
+    get:
+      tags:
+        - Agents & Events
+      security:
+        - BearerAuth: []
+      operationId: getAgentLogs
+      summary: Get logs for an agent
+      parameters:
+        - in: path
+          name: environmentId
+          required: true
+          schema:
+            $ref: '#/components/schemas/EnvironmentId'
+        - in: path
+          name: agentId
+          required: true
+          schema:
+            $ref: '#/components/schemas/AgentId'
+      responses:
+        '200':
+          $ref: '#/components/responses/AgentLogs'
+        '400':
+          $ref: '#/components/responses/Error'
+        '404':
+          $ref: '#/components/responses/Error'
+  '/environments/{environmentId}/events':
+    get:
+      description: "---\nstoplight-id: 434d918eccd85\n---\n\n## Event Lifecycle\nListed here are all the event topics that the Flatfile Platform emits.\n\n<table width=\"100%>\n<thead>\n<tr>\n  <th width=\"40%\">Topic</th>\n  <th>Data</th>\n</tr>\n</thead>\n<tbody>\n<tr>\n  <td colspan=\"2\">\n    <h4>Space Events Lifecycle</h4>\n    <code>space:added</code> -->️ <code>space:removed</code>\n  </td>\n</tr>\n<tr>\n  <td><code>space:added</code><br/>Emitted after a space has been successfully added.</td>\n  <td>\n\n  ```json\n  {\n    \"context\": {\n      \"accountId\": \"us_acc_uj6s91wc\",\n      \"environmentId\": \"us_env_hVXkXs0b\",\n      \"spaceId\": \"us_sp_DrdXetPN\",\n      \"workbookId\": \"us_wb_qGZbKwDW\",\n    },\n    \"payload\": {},\n  }\n  ```\n\n  </td>\n</tr>\n<tr>\n  <td><code>space:removed</code><br/>Emitted after a space has been successfully removed.</td>\n  <td>\n\n  ```json\n  {\n    \"context\": {\n      \"accountId\": \"us_acc_uj6s91wc\",\n      \"environmentId\": \"us_env_hVXkXs0b\",\n      \"spaceId\": \"us_sp_DrdXetPN\",\n      \"workbookId\": \"us_wb_qGZbKwDW\",\n    },\n    \"payload\": {},\n  }\n  ```\n\n  </td>\n</tr>\n<tr>\n  <td colspan=\"2\">\n    <h4>Workbook Events Lifecycle</h4>\n    <code>workbook:added</code> -->️ <code>workbook:removed</code>\n  </td>\n</tr>\n<tr>\n  <td><code>workbook:added</code><br/>Emitted after a workbook has been successfully added.</td>\n  <td>\n\n  ```json\n  {\n    \"context\": {\n      \"accountId\": \"us_acc_uj6s91wc\",\n      \"environmentId\": \"us_env_hVXkXs0b\",\n      \"spaceId\": \"us_sp_DrdXetPN\",\n      \"workbookId\": \"us_wb_qGZbKwDW\",\n    },\n    \"payload\": {},\n  }\n  ```\n\n  </td>\n</tr>\n<tr>\n  <td><code>workbook:removed</code><br/>Emitted after a workbook has been successfully removed.</td>\n  <td>\n\n  ```json\n  {\n    \"context\": {\n      \"accountId\": \"us_acc_uj6s91wc\",\n      \"environmentId\": \"us_env_hVXkXs0b\",\n      \"spaceId\": \"us_sp_DrdXetPN\",\n      \"workbookId\": \"us_wb_qGZbKwDW\",\n    },\n    \"payload\": {},\n  }\n  ```\n\n  </td>\n</tr>\n<tr>\n  <td colspan=\"2\">\n    <h4>User Events Lifecycle</h4>\n    <code>user:added</code> -->️ <code>user:online</code> <--> <code>user:offline</code> --> <code>user:removed</code>\n  </td>\n</tr>\n<tr>\n  <td>❌ <code>user:added</code><br/>Emitted after a user has been successfully added.</td>\n  <td>\n\n  ```json\n  {\n    // this event has not been set up\n  }\n  ```\n\n  </td>\n</tr>\n<tr>\n  <td>❌ <code>user:removed</code><br/>Emitted after a user has been successfully removed.</td>\n  <td>\n\n  ```json\n  {\n    // this event has not been set up\n  }\n  ```\n\n  </td>\n</tr>\n<tr>\n  <td>❌ <code>user:online</code><br/>Emitted when a user is logged in and using a workbook.</td>\n  <td>\n\n  ```json\n  {\n    // this event has not been set up\n  }\n  ```\n\n  </td>\n</tr>\n<tr>\n  <td>❌ <code>user:offline</code><br/>Emitted after a user logs out or becomes inactive.</td>\n  <td>\n\n  ```json\n  {\n    // this event has not been set up\n  }\n  ```\n\n  </td>\n</tr>\n<tr>\n  <td colspan=\"2\">\n    <h4>Upload Events Lifecycle</h4>\n    <code>upload:started</code> --> (<code>upload:failed</code> OR <code>upload:completed</code>)\n  </td>\n</tr>\n<tr>\n  <td><code>upload:started</code><br/>Emitted immediately after a file upload begins. The file could still fail or succeed.</td>\n  <td>\n\n  ```json\n  {\n    \"context\": {\n      \"accountId\": \"us_acc_uj6s91wc\",\n      \"environmentId\": \"us_env_hVXkXs0b\",\n      \"spaceId\": \"us_sp_DrdXetPN\",\n    },\n    \"payload\": {},\n  }\n  ```\n\n  </td>\n</tr>\n<tr>\n  <td><code>upload:failed</code><br/>Emitted when a file upload fails.</td>\n  <td>\n\n  ```json\n  {\n    \"context\": {\n      \"accountId\": \"us_acc_uj6s91wc\",\n      \"environmentId\": \"us_env_hVXkXs0b\",\n      \"spaceId\": \"us_sp_DrdXetPN\",\n    },\n    \"payload\": {},\n  }\n  ```\n\n  </td>\n</tr>\n<tr>\n  <td><code>upload:completed</code><br/>Emitted after a file upload succeeds.</td>\n  <td>\n\n  ```json\n  {\n    \"context\": {\n      \"accountId\": \"us_acc_uj6s91wc\",\n      \"environmentId\": \"us_env_hVXkXs0b\",\n      \"spaceId\": \"us_sp_DrdXetPN\",\n      \"fileId\": \"us_fl_qGZbKwDW\",\n    },\n    \"payload\": {},\n  }\n  ```\n\n  </td>\n</tr>\n<tr>\n  <td colspan=\"2\">\n    <h4>Job Events Lifecycle</h4>\n    <code>job:waiting</code> --> <code>job:started</code> -->️ <code>job:updated</code>\U0001F501 --> (<code>job:failed</code> OR <code>job:completed</code>)\n  </td>\n</tr>\n<tr>\n  <td><code>job:started</code><br/>Emitted immediately before a job begins execution.</td>\n  <td>\n\n  ```json\n  {\n    \"context\": {\n      \"accountId\": \"us_acc_uj6s91wc\",\n      \"environmentId\": \"us_env_hVXkXs0b\",\n      \"spaceId\": \"us_sp_DrdXetPN\",\n      \"workbookId\": \"us_wb_qGZbKwDW\",\n      \"fileId\": \"us_fl_qGZbKwDW\" || undefined,\n      \"jobId\": \"us_jb_UQg89Drd\",\n    },\n    \"payload\": {\n      \"type\": \"FILE\" || \"PIPELINE\",\n      \"operation\": \"EXTRACT\" || \"MAP\",\n    },\n    \"attributes\": {\n      \"progress\": {\n        \"current\": 0,\n        \"total\": 5,\n        \"percent\": 0\n      }\n    },\n  }\n  ```\n\n  </td>\n</tr>\n<tr>\n  <td><code>job:waiting</code><br/>Emitted after a job has been successfully created and is ready for execution.</td>\n  <td>\n\n  ```json\n  {\n    \"context\": {\n      \"accountId\": \"us_acc_uj6s91wc\",\n      \"environmentId\": \"us_env_hVXkXs0b\",\n      \"spaceId\": \"us_sp_DrdXetPN\",\n      \"workbookId\": \"us_wb_qGZbKwDW\",\n      \"fileId\": \"us_fl_qGZbKwDW\" || undefined,\n      \"jobId\": \"us_jb_UQg89Drd\",\n    },\n    \"payload\": {},\n  }\n  ```\n\n  </td>\n</tr>\n<tr>\n  <td><code>job:updated</code><br/>Emitted when a jobs progress has been updated.</td>\n  <td>\n\n  ```json\n  {\n    \"context\": {\n      \"accountId\": \"us_acc_uj6s91wc\",\n      \"environmentId\": \"us_env_hVXkXs0b\",\n      \"spaceId\": \"us_sp_DrdXetPN\",\n      \"workbookId\": \"us_wb_qGZbKwDW\",\n      \"sheetId\": \"us_sh_fHfzjzHb\",\n      \"fileId\": \"us_fl_qGZbKwDW\" || undefined,\n      \"jobId\": \"us_jb_UQg89Drd\",\n    },\n    \"payload\": {\n      \"type\": \"FILE\" || \"PIPELINE\",\n      \"operation\": \"EXTRACT\" || \"MAP\",\n    },\n    \"attributes\": {\n      \"progress\": {\n        \"current\": 3,\n        \"total\": 5,\n        \"percent\": 60\n      }\n    },\n  }\n  ```\n\n  </td>\n</tr>\n<tr>\n  <td><code>job:failed</code><br/>Emitted after a job fails.</td>\n  <td>\n\n  ```json\n  {\n    \"context\": {\n      \"accountId\": \"us_acc_uj6s91wc\",\n      \"environmentId\": \"us_env_hVXkXs0b\",\n      \"spaceId\": \"us_sp_DrdXetPN\",\n      \"workbookId\": \"us_wb_qGZbKwDW\",\n      \"fileId\": \"us_fl_qGZbKwDW\" || undefined,\n      \"jobId\": \"us_jb_UQg89Drd\",\n    },\n    \"payload\": {\n      \"err\": \"Error executing job: us_jb_UQg89Drd\",\n      \"type\": \"FILE\" || \"PIPELINE\",\n      \"operation\": \"EXTRACT\" || \"MAP\",\n    },\n    \"attributes\": {\n      \"progress\": {\n        \"current\": 3,\n        \"total\": 5,\n        \"percent\": 60\n      }\n    },\n  }\n  ```\n\n  </td>\n</tr>\n<tr>\n  <td><code>job:completed</code><br/>Emitted after a job successfully completes.</td>\n  <td>\n\n  ```json\n  {\n    \"context\": {\n      \"accountId\": \"us_acc_uj6s91wc\",\n      \"environmentId\": \"us_env_hVXkXs0b\",\n      \"spaceId\": \"us_sp_DrdXetPN\",\n      \"workbookId\": \"us_wb_qGZbKwDW\",\n      \"sheetId\": \"us_sh_fHfzjzHb\",\n      \"fileId\": \"us_fl_qGZbKwDW\" || undefined,\n      \"jobId\": \"us_jb_UQg89Drd\",\n    },\n    \"payload\": {\n      \"type\": \"FILE\" || \"PIPELINE\",\n      \"operation\": \"EXTRACT\" || \"MAP\",\n    },\n    \"attributes\": {\n      \"progress\": {\n        \"current\": 5,\n        \"total\": 5,\n        \"percent\": 100\n      }\n    },\n  }\n  ```\n\n  </td>\n</tr>\n<tr>\n  <td colspan=\"2\">\n    <h4>Records Events Lifecycle</h4>\n    <code>records:created</code> -->️ (<code>records:updated</code>\U0001F501 OR <code>records:deleted</code>)\n  </td>\n</tr>\n<tr>\n  <td><code>records:created</code><br/>Emitted after records have been successfully added to a sheet.</td>\n  <td>\n\n  ```json\n  {\n    \"context\": {\n      \"accountId\": \"us_acc_uj6s91wc\",\n      \"environmentId\": \"us_env_hVXkXs0b\",\n      \"spaceId\": \"us_sp_DrdXetPN\",\n      \"workbookId\": \"us_wb_qGZbKwDW\",\n      \"sheetId\": \"us_sh_fHfzjzHb\",\n      \"sheetSlug\": \"test/mySheet\",\n      \"versionId\": \"us_vr_jte4tzVn\",\n    },\n    \"payload\": {\n      \"count\": 100,\n    },\n    \"dataUrl\": \"v1/workbooks/us_wb_qGZbKwDW/sheets/us_sh_fHfzjzHb/records?versionId=us_vr_jte4tzVn\",\n  }\n  ```\n\n  </td>\n</tr>\n<tr>\n  <td><code>records:updated</code><br/>Emitted after records have been updated. This could be a manual update or an update via a Data Hook.</td>\n  <td>\n\n  ```json\n  {\n    \"context\": {\n      \"accountId\": \"us_acc_uj6s91wc\",\n      \"environmentId\": \"us_env_hVXkXs0b\",\n      \"spaceId\": \"us_sp_DrdXetPN\",\n      \"workbookId\": \"us_wb_qGZbKwDW\",\n      \"sheetId\": \"us_sh_fHfzjzHb\",\n      \"sheetSlug\": \"test/mySheet\",\n      \"versionId\": \"us_vr_jte4tzVn\",\n    },\n    \"payload\": {\n      \"count\": 100,\n    } || {},\n    \"dataUrl\": \"v1/workbooks/us_wb_qGZbKwDW/sheets/us_sh_fHfzjzHb/records?versionId=us_vr_jte4tzVn\",\n  }\n  ```\n\n  </td>\n</tr>\n<tr>\n  <td>❌ <code>records:deleted</code><br/>Emitted after records have been deleted.</td>\n  <td>\n\n  ```json\n  {\n    // this event has not been set up\n  }\n  ```\n\n  </td>\n</tr>\n<tr>\n  <td colspan=\"2\">\n    <h4>File Events Lifecycle</h4>\n    <code>file:deleted</code>\n  </td>\n</tr>\n<tr>\n  <td><code>file:deleted</code><br/>Emitted after a file has been deleted.</td>\n  <td>\n\n  ```json\n  {\n    \"context\": {\n      \"accountId\": \"us_acc_uj6s91wc\",\n      \"environmentId\": \"us_env_hVXkXs0b\",\n      \"spaceId\": \"us_sp_DrdXetPN\",\n      \"fileId\": \"us_fl_qGZbKwDW\",\n    },\n    \"payload\": {},\n  }\n  ```\n\n  </td>\n</tr>\n</tbody>\n</table>"
+      tags:
+        - Agents & Events
+      security:
+        - BearerAuth: []
+      operationId: getEvents
+      summary: List events
+      parameters:
+        - in: path
+          name: environmentId
+          required: true
+          schema:
+            $ref: '#/components/schemas/EnvironmentId'
+        - in: query
+          name: spaceId
+          schema:
+            $ref: '#/components/schemas/SpaceId'
+        - in: query
+          name: domain
+          schema:
+            type: string
+          description: Filter by event domain
+        - in: query
+          name: topic
+          schema:
+            type: string
+          description: Filter by event topic
+        - in: query
+          name: since
+          schema:
+            type: string
+            format: date-time
+          description: Filter by event timestamp
+        - in: query
+          name: pageSize
+          schema:
+            type: integer
+          description: Number of tokens to return in a page (default 10)
+        - in: query
+          name: pageNumber
+          schema:
+            type: integer
+          description: 'Based on pageSize, which page of records to return'
+        - in: query
+          name: includeAcknowledged
+          schema:
+            type: boolean
+            default: false
+          description: Include acknowledged events
+      responses:
+        '200':
+          $ref: '#/components/responses/Events'
+    post:
+      tags:
+        - Agents & Events
+      security:
+        - BearerAuth: []
+      operationId: createEvent
+      summary: Create an event
+      parameters:
+        - in: path
+          name: environmentId
+          required: true
+          schema:
+            $ref: '#/components/schemas/EnvironmentId'
+      requestBody:
+        $ref: '#/components/requestBodies/Event'
+      responses:
+        '201':
+          $ref: '#/components/responses/Event'
+        '400':
+          $ref: '#/components/responses/Error'
+        '404':
+          $ref: '#/components/responses/Error'
+  '/environments/{environmentId}/events/{eventId}':
+    get:
+      tags:
+        - Agents & Events
+      security:
+        - BearerAuth: []
+      operationId: getEvent
+      summary: Get an event
+      parameters:
+        - in: path
+          name: environmentId
+          required: true
+          schema:
+            $ref: '#/components/schemas/EnvironmentId'
+        - in: path
+          name: eventId
+          schema:
+            $ref: '#/components/schemas/EventId'
+          required: true
+          description: The event id
+      responses:
+        '200':
+          $ref: '#/components/responses/Event'
+  '/environments/{environmentId}/events/{eventId}/ack':
+    post:
+      tags:
+        - Agents & Events
+      security:
+        - BearerAuth: []
+      operationId: ackEvent
+      summary: Acknowledge an event
+      parameters:
+        - in: path
+          name: environmentId
+          required: true
+          schema:
+            $ref: '#/components/schemas/EnvironmentId'
+        - in: path
+          name: eventId
+          schema:
+            $ref: '#/components/schemas/EventId'
+          required: true
+          description: The event id
+      responses:
+        '200':
+          $ref: '#/components/responses/Success'
+  /jobs:
+    get:
+      tags:
+        - Jobs
+      security:
+        - BearerAuth: []
+      operationId: getJobs
+      summary: List jobs
+      parameters:
+        - in: query
+          name: environmentId
+          schema:
+            $ref: '#/components/schemas/EnvironmentId'
+        - in: query
+          name: spaceId
+          schema:
+            $ref: '#/components/schemas/SpaceId'
+        - in: query
+          name: workbookId
+          schema:
+            $ref: '#/components/schemas/WorkbookId'
+        - in: query
+          name: fileId
+          schema:
+            $ref: '#/components/schemas/FileId'
+      responses:
+        '200':
+          $ref: '#/components/responses/Jobs'
+        '400':
+          $ref: '#/components/responses/Error'
+        '404':
+          $ref: '#/components/responses/Error'
+    post:
+      tags:
+        - Jobs
+      security:
+        - BearerAuth: []
+      operationId: createJob
+      summary: Create a job
+      requestBody:
+        $ref: '#/components/requestBodies/Job'
+      responses:
+        '200':
+          $ref: '#/components/responses/Job'
+        '400':
+          $ref: '#/components/responses/Error'
+        '404':
+          $ref: '#/components/responses/Error'
+  '/jobs/{jobId}':
+    get:
+      tags:
+        - Jobs
+      security:
+        - BearerAuth: []
+      operationId: getJob
+      summary: Get a job
+      parameters:
+        - in: path
+          name: jobId
+          required: true
+          schema:
+            $ref: '#/components/schemas/JobId'
+      responses:
+        '200':
+          $ref: '#/components/responses/Job'
+        '400':
+          $ref: '#/components/responses/Error'
+        '404':
+          $ref: '#/components/responses/Error'
+    delete:
+      tags:
+        - Jobs
+      security:
+        - BearerAuth: []
+      operationId: deleteJob
+      summary: Delete a job
+      parameters:
+        - in: path
+          name: jobId
+          required: true
+          schema:
+            $ref: '#/components/schemas/JobId'
+      responses:
+        '200':
+          $ref: '#/components/responses/Success'
+        '400':
+          $ref: '#/components/responses/Error'
+        '404':
+          $ref: '#/components/responses/Error'
+  '/jobs/{jobId}/plan':
+    get:
+      tags:
+        - Jobs
+      operationId: getJobExecutionPlan
+      summary: Get a job's execution plan
+      description: Returns a single job's execution plan
+      security:
+        - BearerAuth: []
+      parameters:
+        - name: jobId
+          in: path
+          description: ID of job to return
+          required: true
+          schema:
+            $ref: '#/components/schemas/JobId'
+      responses:
+        '200':
+          $ref: '#/components/responses/JobPlan'
+        '400':
+          $ref: '#/components/responses/Error'
+        '404':
+          $ref: '#/components/responses/Error'
+    patch:
+      tags:
+        - Jobs
+      operationId: updateJobExecutionPlanFields
+      summary: Update a job's plan
+      description: Update a one or more individual fields on a job's execution plan
+      security:
+        - BearerAuth: []
+      parameters:
+        - name: jobId
+          in: path
+          description: ID of job to return
+          required: true
+          schema:
+            $ref: '#/components/schemas/JobId'
+      requestBody:
+        $ref: '#/components/requestBodies/Plan'
+      responses:
+        '202':
+          $ref: '#/components/responses/JobPlan'
+        '400':
+          $ref: '#/components/responses/Error'
+        '404':
+          $ref: '#/components/responses/Error'
+    put:
+      tags:
+        - Jobs
+      operationId: updateJobExecutionPlanById
+      summary: Replace a job's plan
+      description: Update a job's entire execution plan
+      security:
+        - BearerAuth: []
+      parameters:
+        - name: jobId
+          in: path
+          description: ID of job to return
+          required: true
+          schema:
+            $ref: '#/components/schemas/JobId'
+      requestBody:
+        $ref: '#/components/requestBodies/Plan'
+      responses:
+        '202':
+          $ref: '#/components/responses/JobPlan'
+        '400':
+          $ref: '#/components/responses/Error'
+        '404':
+          $ref: '#/components/responses/Error'
+  '/jobs/{jobId}/execute':
+    post:
+      tags:
+        - Jobs
+      operationId: executeJob
+      summary: Execute a job
+      description: Execute a job and return the job
+      security:
+        - BearerAuth: []
+      parameters:
+        - name: jobId
+          in: path
+          description: ID of job to return
+          required: true
+          schema:
+            $ref: '#/components/schemas/JobId'
+      responses:
+        '201':
+          $ref: '#/components/responses/Success'
+        '400':
+          $ref: '#/components/responses/Error'
+        '404':
+          $ref: '#/components/responses/Error'
+        '422':
+          $ref: '#/components/responses/Error'
+  /spaces/configs:
+    get:
+      tags:
+        - Spaces & Documents
+      operationId: getAllSpaceConfigs
+      summary: List space configs
+      description: Returns all space configs for an account
+      security:
+        - BearerAuth: []
+      parameters:
+        - in: query
+          name: environmentId
+          schema:
+            $ref: '#/components/schemas/EnvironmentId'
+      responses:
+        '200':
+          $ref: '#/components/responses/SpacePatterns'
+        '400':
+          $ref: '#/components/responses/Error'
+    post:
+      tags:
+        - Spaces & Documents
+      operationId: addSpaceConfig
+      summary: Create a space config
+      description: Creates a new Space Config
+      security:
+        - BearerAuth: []
+      requestBody:
+        $ref: '#/components/requestBodies/SpacePattern'
+      responses:
+        '201':
+          $ref: '#/components/responses/SpacePattern'
+        '400':
+          $ref: '#/components/responses/Error'
+    put:
+      tags:
+        - Spaces & Documents
+      operationId: replaceSpaceConfig
+      summary: Replace a space config
+      description: Replaces an existing Space Config and optionally migrates all spaces using the config
+      security:
+        - BearerAuth: []
+      parameters:
+        - in: query
+          name: migrate
+          schema:
+            type: boolean
+      requestBody:
+        $ref: '#/components/requestBodies/SpacePattern'
+      responses:
+        '201':
+          $ref: '#/components/responses/SpacePattern'
+        '400':
+          $ref: '#/components/responses/Error'
+  /spaces:
+    get:
+      tags:
+        - Spaces & Documents
+      operationId: getAllSpaces
+      summary: List spaces
+      description: Returns all spaces for an account or environment
+      security:
+        - BearerAuth: []
+      parameters:
+        - in: query
+          name: environmentId
+          schema:
+            $ref: '#/components/schemas/EnvironmentId'
+        - in: query
+          name: pageSize
+          schema:
+            type: integer
+          description: Number of spaces to return in a page (default 10)
+        - in: query
+          name: pageNumber
+          schema:
+            type: integer
+          description: 'Based on pageSize, which page of records to return'
+        - in: query
+          name: search
+          schema:
+            type: string
+        - in: query
+          name: sortField
+          schema:
+            $ref: '#/components/schemas/GetSpacesSortField'
+        - in: query
+          name: sortDirection
+          schema:
+            $ref: '#/components/schemas/SortDirection'
+      responses:
+        '200':
+          $ref: '#/components/responses/Spaces'
+        '400':
+          $ref: '#/components/responses/Error'
+    post:
+      tags:
+        - Spaces & Documents
+      operationId: addSpace
+      summary: Create a space
+      description: Creates a new space based on an existing Space Config
+      security:
+        - BearerAuth: []
+      requestBody:
+        $ref: '#/components/requestBodies/Space'
+      responses:
+        '200':
+          $ref: '#/components/responses/Space'
+        '400':
+          $ref: '#/components/responses/Error'
+  '/spaces/{spaceId}':
+    get:
+      tags:
+        - Spaces & Documents
+      operationId: getSpaceById
+      summary: Get a space
+      description: Returns a single space
+      security:
+        - BearerAuth: []
+      parameters:
+        - name: spaceId
+          in: path
+          description: ID of space to return
+          required: true
+          schema:
+            $ref: '#/components/schemas/SpaceId'
+      responses:
+        '200':
+          $ref: '#/components/responses/Space'
+        '400':
+          $ref: '#/components/responses/Error'
+        '404':
+          $ref: '#/components/responses/Error'
+    patch:
+      tags:
+        - Spaces & Documents
+      operationId: updateSpaceById
+      summary: Update a space
+      description: 'Update a space, to change the name for example'
+      security:
+        - BearerAuth: []
+      parameters:
+        - name: spaceId
+          in: path
+          description: ID of space to update
+          required: true
+          schema:
+            $ref: '#/components/schemas/SpaceId'
+      requestBody:
+        $ref: '#/components/requestBodies/Space'
+      responses:
+        '200':
+          $ref: '#/components/responses/Space'
+        '400':
+          $ref: '#/components/responses/Error'
+        '404':
+          $ref: '#/components/responses/Error'
+    delete:
+      tags:
+        - Spaces & Documents
+      operationId: deleteSpaceById
+      summary: Delete a space
+      description: Delete a space
+      security:
+        - BearerAuth: []
+      parameters:
+        - name: spaceId
+          in: path
+          description: ID of space to delete
+          required: true
+          schema:
+            $ref: '#/components/schemas/SpaceId'
+      responses:
+        '200':
+          $ref: '#/components/responses/Success'
+        '400':
+          $ref: '#/components/responses/Error'
+        '404':
+          $ref: '#/components/responses/Error'
+  '/spaces/{spaceId}/documents':
+    get:
+      tags:
+        - Spaces & Documents
+      security:
+        - BearerAuth: []
+      operationId: getSpaceDocuments
+      summary: List documents
+      description: Returns all documents for a space
+      parameters:
+        - name: spaceId
+          in: path
+          description: ID of space to return
+          required: true
+          schema:
+            $ref: '#/components/schemas/SpaceId'
+      responses:
+        '200':
+          $ref: '#/components/responses/Documents'
+        '400':
+          $ref: '#/components/responses/Error'
+        '404':
+          $ref: '#/components/responses/Error'
+    post:
+      tags:
+        - Spaces & Documents
+      operationId: addDocumentToSpace
+      summary: Create a document
+      description: Add a new document to the space
+      security:
+        - BearerAuth: []
+      parameters:
+        - name: spaceId
+          in: path
+          description: ID of space to add the document on
+          required: true
+          schema:
+            $ref: '#/components/schemas/SpaceId'
+      requestBody:
+        $ref: '#/components/requestBodies/Document'
+      responses:
+        '200':
+          $ref: '#/components/responses/Document'
+        '400':
+          $ref: '#/components/responses/Error'
+        '404':
+          $ref: '#/components/responses/Error'
+  '/spaces/{spaceId}/documents/{documentId}':
+    get:
+      tags:
+        - Spaces & Documents
+      security:
+        - BearerAuth: []
+      operationId: getSpaceDocumentById
+      summary: Get a document
+      description: Returns a single document
+      parameters:
+        - name: spaceId
+          in: path
+          description: ID of space to return
+          required: true
+          schema:
+            $ref: '#/components/schemas/SpaceId'
+        - name: documentId
+          in: path
+          description: ID of document to return
+          required: true
+          schema:
+            $ref: '#/components/schemas/DocumentId'
+      responses:
+        '200':
+          $ref: '#/components/responses/Document'
+        '400':
+          $ref: '#/components/responses/Error'
+        '404':
+          $ref: '#/components/responses/Error'
+    patch:
+      tags:
+        - Spaces & Documents
+      security:
+        - BearerAuth: []
+      operationId: updateDocument
+      summary: Update a document
+      description: 'updates a single document, for only the body and title'
+      parameters:
+        - name: spaceId
+          in: path
+          description: ID of space to return
+          required: true
+          schema:
+            $ref: '#/components/schemas/SpaceId'
+        - name: documentId
+          in: path
+          description: ID of document to return
+          required: true
+          schema:
+            $ref: '#/components/schemas/DocumentId'
+      requestBody:
+        $ref: '#/components/requestBodies/Document'
+      responses:
+        '200':
+          $ref: '#/components/responses/Document'
+        '400':
+          $ref: '#/components/responses/Error'
+        '404':
+          $ref: '#/components/responses/Error'
+  /guests:
+    get:
+      tags:
+        - Users & Guests
+      security:
+        - BearerAuth: []
+      operationId: getGuests
+      summary: List guests
+      description: Returns all guests
+      parameters:
+        - name: spaceId
+          in: query
+          description: ID of space to return
+          required: true
+          schema:
+            $ref: '#/components/schemas/SpaceId'
+      responses:
+        '200':
+          $ref: '#/components/responses/Guests'
+        '400':
+          $ref: '#/components/responses/Error'
+        '404':
+          $ref: '#/components/responses/Error'
+    post:
+      tags:
+        - Users & Guests
+      operationId: addGuestToSpace
+      summary: Create a guest
+      description: 'Guests are only there to upload, edit, and download files and perform their tasks in a specific Space.'
+      security:
+        - BearerAuth: []
+      requestBody:
+        $ref: '#/components/requestBodies/Guests'
+      responses:
+        '200':
+          $ref: '#/components/responses/Guests'
+        '400':
+          $ref: '#/components/responses/Error'
+        '404':
+          $ref: '#/components/responses/Error'
+  '/guests/{guestId}':
+    get:
+      tags:
+        - Users & Guests
+      security:
+        - BearerAuth: []
+      operationId: getSpaceGuestById
+      summary: Get a guest
+      description: Returns a single guest
+      parameters:
+        - name: guestId
+          in: path
+          description: ID of guest to return
+          required: true
+          schema:
+            $ref: '#/components/schemas/GuestId'
+      responses:
+        '200':
+          $ref: '#/components/responses/Guest'
+        '400':
+          $ref: '#/components/responses/Error'
+        '404':
+          $ref: '#/components/responses/Error'
+    patch:
+      tags:
+        - Users & Guests
+      security:
+        - BearerAuth: []
+      operationId: updateGuest
+      summary: Update a guest
+      description: 'Updates a single guest, for example to change name or email'
+      parameters:
+        - name: guestId
+          in: path
+          description: ID of guest to return
+          required: true
+          schema:
+            $ref: '#/components/schemas/GuestId'
+      requestBody:
+        $ref: '#/components/requestBodies/Guest'
+      responses:
+        '200':
+          $ref: '#/components/responses/Guest'
+        '400':
+          $ref: '#/components/responses/Error'
+        '404':
+          $ref: '#/components/responses/Error'
+    delete:
+      tags:
+        - Users & Guests
+      security:
+        - BearerAuth: []
+      operationId: deleteGuest
+      summary: Delete a guest
+      description: Deletes a single guest
+      parameters:
+        - name: guestId
+          in: path
+          description: ID of guest to return
+          required: true
+          schema:
+            $ref: '#/components/schemas/GuestId'
+      responses:
+        '200':
+          $ref: '#/components/responses/Success'
+        '400':
+          $ref: '#/components/responses/Error'
+        '404':
+          $ref: '#/components/responses/Error'
+  /invitations:
+    post:
+      tags:
+        - Users & Guests
+      security:
+        - BearerAuth: []
+      operationId: inviteGuests
+      summary: Invite guests
+      description: Guests can be created as a named guest on the Space or there’s a global link that will let anonymous guests into the space.
+      requestBody:
+        $ref: '#/components/requestBodies/Invite'
+      responses:
+        '200':
+          $ref: '#/components/responses/Success'
+        '400':
+          $ref: '#/components/responses/Error'
+        '404':
+          $ref: '#/components/responses/Error'
+  /invitations/exchange:
+    post:
+      tags:
+        - Users & Guests
+      operationId: exchangeInvitation
+      summary: Exchange an invitation for an access token
+      description: Exchange an invitation for an access token
+      requestBody:
+        $ref: '#/components/requestBodies/Token'
+      responses:
+        '200':
+          $ref: '#/components/responses/Exchange'
+        '400':
+          $ref: '#/components/responses/Error'
+        '404':
+          $ref: '#/components/responses/Error'
+  '/spaces/{spaceId}/subscription':
+    get:
+      tags:
+        - Spaces & Documents
+      security:
+        - BearerAuth: []
+      operationId: getEventToken
+      summary: Get subscription credentials
+      description: Get a token which can be used to subscribe to events for this space
+      parameters:
+        - name: spaceId
+          in: path
+          description: ID of space to return
+          required: true
+          schema:
+            $ref: '#/components/schemas/SpaceId'
+      responses:
+        '200':
+          $ref: '#/components/responses/EventToken'
+        '400':
+          $ref: '#/components/responses/Error'
+        '404':
+          $ref: '#/components/responses/Error'
+  /workbooks:
+    get:
+      tags:
+        - Workbooks & Sheets
+      operationId: getAllWorkbooks
+      summary: List workbooks
+      description: Returns all workbooks matching a filter for an account or space
+      security:
+        - BearerAuth: []
+      parameters:
+        - in: query
+          name: spaceId
+          schema:
+            $ref: '#/components/schemas/SpaceId'
+      responses:
+        '200':
+          $ref: '#/components/responses/Workbooks'
+        '400':
+          $ref: '#/components/responses/Error'
+    post:
+      tags:
+        - Workbooks & Sheets
+      operationId: addWorkbook
+      summary: Create a workbook
+      description: Creates a workbook and adds it to a space
+      security:
+        - BearerAuth: []
+      requestBody:
+        $ref: '#/components/requestBodies/WorkbookConfig'
+      responses:
+        '201':
+          $ref: '#/components/responses/Workbook'
+        '400':
+          $ref: '#/components/responses/Error'
+  '/workbooks/{workbookId}':
+    get:
+      tags:
+        - Workbooks & Sheets
+      operationId: getWorkbookById
+      summary: Get a workbook
+      description: Returns a single workbook
+      security:
+        - BearerAuth: []
+      parameters:
+        - name: workbookId
+          in: path
+          description: ID of workbook to return
+          required: true
+          schema:
+            $ref: '#/components/schemas/WorkbookId'
+      responses:
+        '200':
+          $ref: '#/components/responses/Workbook'
+        '400':
+          $ref: '#/components/responses/Error'
+        '404':
+          $ref: '#/components/responses/Error'
+    delete:
+      tags:
+        - Workbooks & Sheets
+      operationId: deleteWorkbookById
+      summary: Delete a workbook
+      description: Delete a workbook
+      security:
+        - BearerAuth: []
+      parameters:
+        - name: workbookId
+          in: path
+          description: ID of workbook to delete
+          required: true
+          schema:
+            $ref: '#/components/schemas/WorkbookId'
+      responses:
+        '200':
+          $ref: '#/components/responses/Success'
+        '400':
+          $ref: '#/components/responses/Error'
+        '404':
+          $ref: '#/components/responses/Error'
+  '/workbooks/{workbookId}/sheets':
+    get:
+      tags:
+        - Workbooks & Sheets
+      operationId: getSheets
+      summary: List sheets
+      description: Returns sheets in a workbook
+      security:
+        - BearerAuth: []
+      parameters:
+        - name: workbookId
+          in: path
+          description: ID of workbook
+          required: true
+          schema:
+            $ref: '#/components/schemas/WorkbookId'
+      responses:
+        '200':
+          $ref: '#/components/responses/Sheets'
+        '400':
+          $ref: '#/components/responses/Error'
+        '404':
+          $ref: '#/components/responses/Error'
+  '/workbooks/{workbookId}/sheets/{sheetId}':
+    get:
+      tags:
+        - Workbooks & Sheets
+      operationId: getSheet
+      summary: Get a sheet
+      description: Returns a sheet in a workbook
+      security:
+        - BearerAuth: []
+      parameters:
+        - name: workbookId
+          in: path
+          description: ID of workbook
+          required: true
+          schema:
+            $ref: '#/components/schemas/WorkbookId'
+        - name: sheetId
+          in: path
+          description: ID of sheet
+          required: true
+          schema:
+            $ref: '#/components/schemas/SheetId'
+      responses:
+        '200':
+          $ref: '#/components/responses/Sheet'
+        '400':
+          $ref: '#/components/responses/Error'
+        '404':
+          $ref: '#/components/responses/Error'
+  '/workbooks/{workbookId}/sheets/{sheetId}/records':
+    get:
+      tags:
+        - Workbooks & Sheets
+      operationId: getRecords
+      summary: Get records
+      description: Returns records from a sheet in a workbook
+      security:
+        - BearerAuth: []
+      parameters:
+        - name: workbookId
+          in: path
+          description: ID of workbook
+          required: true
+          schema:
+            $ref: '#/components/schemas/WorkbookId'
+        - name: sheetId
+          in: path
+          description: ID of sheet
+          required: true
+          schema:
+            $ref: '#/components/schemas/SheetId'
+        - in: query
+          name: versionId
+          schema:
+            $ref: '#/components/schemas/VersionId'
+        - in: query
+          name: sortField
+          schema:
+            type: string
+          description: Name of field by which to sort records
+        - in: query
+          name: sortDirection
+          description: Sort direction - asc (ascending) or desc (descending)
+          schema:
+            $ref: '#/components/schemas/SortDirection'
+        - in: query
+          name: filter
+          description: Options to filter records
+          schema:
+            $ref: '#/components/schemas/Filter'
+        - in: query
+          name: filterField
+          schema:
+            type: string
+          description: Name of field by which to filter records
+        - in: query
+          name: pageSize
+          schema:
+            type: integer
+          description: Number of records to return in a page (default 1000 if pageNumber included)
+        - in: query
+          name: pageNumber
+          schema:
+            type: integer
+          description: 'Based on pageSize, which page of records to return'
+        - in: query
+          name: includeCounts
+          schema:
+            type: boolean
+          description: 'Include counts for the total records, valid records and records with errors'
+        - in: query
+          name: searchValue
+          schema:
+            type: string
+          description: 'Search the entire sheet for the given value, returning matching rows'
+      responses:
+        '200':
+          $ref: '#/components/responses/RecordsResponse'
+        '400':
+          $ref: '#/components/responses/Error'
+        '404':
+          $ref: '#/components/responses/Error'
+    post:
+      tags:
+        - Workbooks & Sheets
+      operationId: addRecords
+      summary: Insert records
+      description: Adds records to a workbook sheet
+      security:
+        - BearerAuth: []
+      parameters:
+        - name: workbookId
+          in: path
+          description: ID of workbook
+          required: true
+          schema:
+            $ref: '#/components/schemas/WorkbookId'
+        - name: sheetId
+          in: path
+          description: ID of sheet
+          required: true
+          schema:
+            $ref: '#/components/schemas/SheetId'
+      requestBody:
+        $ref: '#/components/requestBodies/RecordsData'
+      responses:
+        '201':
+          $ref: '#/components/responses/RecordsResponse'
+        '400':
+          $ref: '#/components/responses/Error'
+        '404':
+          $ref: '#/components/responses/Error'
+    put:
+      tags:
+        - Workbooks & Sheets
+      operationId: updateRecords
+      summary: Update records
+      description: Updates existing records in a workbook sheet
+      security:
+        - BearerAuth: []
+      parameters:
+        - name: workbookId
+          in: path
+          description: ID of workbook
+          required: true
+          schema:
+            $ref: '#/components/schemas/WorkbookId'
+        - name: sheetId
+          in: path
+          description: ID of sheet
+          required: true
+          schema:
+            $ref: '#/components/schemas/SheetId'
+      requestBody:
+        $ref: '#/components/requestBodies/RecordsUpdates'
+      responses:
+        '200':
+          $ref: '#/components/responses/RecordsResponse'
+        '400':
+          $ref: '#/components/responses/Error'
+        '404':
+          $ref: '#/components/responses/Error'
+    delete:
+      tags:
+        - Workbooks & Sheets
+      operationId: deleteRecords
+      summary: Delete records
+      description: Deletes records from a workbook sheet
+      security:
+        - BearerAuth: []
+      parameters:
+        - name: workbookId
+          in: path
+          description: ID of workbook
+          required: true
+          schema:
+            $ref: '#/components/schemas/WorkbookId'
+        - name: sheetId
+          in: path
+          description: ID of sheet
+          required: true
+          schema:
+            $ref: '#/components/schemas/SheetId'
+        - in: query
+          name: ids
+          description: A list of record ids
+          schema:
+            type: array
+            items:
+              $ref: '#/components/schemas/RecordId'
+            maxItems: 100
+      responses:
+        '200':
+          $ref: '#/components/responses/Success'
+        '400':
+          $ref: '#/components/responses/Error'
+        '404':
+          $ref: '#/components/responses/Error'
+  '/workbooks/{workbookId}/sheets/{sheetId}/download':
+    get:
+      tags:
+        - Workbooks & Sheets
+      operationId: getRecordsCsv
+      summary: Download records as a CSV file
+      description: Returns records from a sheet in a workbook as a csv file
+      security:
+        - BearerAuth: []
+      parameters:
+        - name: workbookId
+          in: path
+          description: ID of workbook
+          required: true
+          schema:
+            $ref: '#/components/schemas/WorkbookId'
+        - name: sheetId
+          in: path
+          description: ID of sheet
+          required: true
+          schema:
+            $ref: '#/components/schemas/SheetId'
+        - in: query
+          name: versionId
+          schema:
+            $ref: '#/components/schemas/VersionId'
+        - in: query
+          name: sortField
+          schema:
+            type: string
+          description: Name of field by which to sort records
+        - in: query
+          name: sortDirection
+          description: Sort direction - asc (ascending) or desc (descending)
+          schema:
+            $ref: '#/components/schemas/SortDirection'
+        - in: query
+          name: filter
+          description: Options to filter records
+          schema:
+            $ref: '#/components/schemas/Filter'
+        - in: query
+          name: filterField
+          schema:
+            type: string
+          description: Name of field by which to filter records
+        - in: query
+          name: ids
+          description: 'A list of record ids to download. If filter is also specified, then this is a list of record ids to exclude from the download.'
+          schema:
+            type: array
+            items:
+              $ref: '#/components/schemas/RecordId'
+            maxItems: 100
+      responses:
+        '200':
+          $ref: '#/components/responses/DownloadCsv'
+        '400':
+          $ref: '#/components/responses/Error'
+        '404':
+          $ref: '#/components/responses/Error'
+  '/workbooks/{workbookId}/sheets/{sheetId}/fields':
+    get:
+      tags:
+        - Workbooks & Sheets
+      operationId: getFields
+      summary: Get fields
+      description: Returns fields from a sheet in a workbook
+      security:
+        - BearerAuth: []
+      parameters:
+        - name: workbookId
+          in: path
+          description: ID of workbook
+          required: true
+          schema:
+            $ref: '#/components/schemas/WorkbookId'
+        - name: sheetId
+          in: path
+          description: ID of sheet
+          required: true
+          schema:
+            $ref: '#/components/schemas/SheetId'
+        - in: query
+          name: sortField
+          schema:
+            type: string
+          description: Name of field by which to sort records
+        - in: query
+          name: sortDirection
+          description: Sort direction - asc (ascending) or desc (descending)
+          schema:
+            $ref: '#/components/schemas/SortDirection'
+        - in: query
+          name: filter
+          description: Options to filter records
+          schema:
+            $ref: '#/components/schemas/Filter'
+        - in: query
+          name: filterField
+          schema:
+            type: string
+          description: Name of field by which to filter records
+        - in: query
+          name: pageSize
+          schema:
+            type: integer
+          description: Number of records to return in a page (default 1000 if pageNumber included)
+        - in: query
+          name: pageNumber
+          schema:
+            type: integer
+          description: 'Based on pageSize, which page of records to return'
+        - in: query
+          name: distinct
+          schema:
+            type: boolean
+          description: 'When true, excludes duplicate values'
+      responses:
+        '200':
+          $ref: '#/components/responses/Fields'
+        '400':
+          $ref: '#/components/responses/Error'
+        '404':
+          $ref: '#/components/responses/Error'
+  '/workbooks/{workbookId}/sheets/{sheetId}/fields/{fieldId}':
+    get:
+      tags:
+        - Workbooks & Sheets
+      operationId: getField
+      summary: Get a field
+      description: Returns a field from a sheet in a workbook
+      security:
+        - BearerAuth: []
+      parameters:
+        - name: workbookId
+          in: path
+          description: ID of workbook
+          required: true
+          schema:
+            $ref: '#/components/schemas/WorkbookId'
+        - name: sheetId
+          in: path
+          description: ID of sheet
+          required: true
+          schema:
+            $ref: '#/components/schemas/SheetId'
+        - name: fieldId
+          in: path
+          description: ID of field
+          required: true
+          schema:
+            title: FieldId
+            description: The field to search in
+            type: string
+            example: first_name
+        - in: query
+          name: sortField
+          schema:
+            type: string
+          description: Name of field by which to sort records
+        - in: query
+          name: sortDirection
+          description: Sort direction - asc (ascending) or desc (descending)
+          schema:
+            $ref: '#/components/schemas/SortDirection'
+        - in: query
+          name: filter
+          description: Options to filter records
+          schema:
+            $ref: '#/components/schemas/Filter'
+        - in: query
+          name: pageSize
+          schema:
+            type: integer
+          description: Number of records to return in a page (default 1000 if pageNumber included)
+        - in: query
+          name: pageNumber
+          schema:
+            type: integer
+          description: 'Based on pageSize, which page of records to return'
+        - in: query
+          name: distinct
+          schema:
+            type: boolean
+          description: 'When true, excludes duplicate values'
+      responses:
+        '200':
+          $ref: '#/components/responses/Fields'
+        '400':
+          $ref: '#/components/responses/Error'
+        '404':
+          $ref: '#/components/responses/Error'
+  '/workbooks/{workbookId}/sheets/{sheetId}/fields/{fieldId}/find/{searchValue}':
+    get:
+      tags:
+        - Workbooks & Sheets
+      operationId: find
+      summary: Find a value in a field
+      description: Searches for the given value in a field and returns the records that match the search criteria
+      security:
+        - BearerAuth: []
+      parameters:
+        - name: workbookId
+          in: path
+          description: ID of workbook
+          required: true
+          schema:
+            $ref: '#/components/schemas/WorkbookId'
+        - name: sheetId
+          in: path
+          description: ID of sheet
+          required: true
+          schema:
+            $ref: '#/components/schemas/SheetId'
+        - name: fieldId
+          in: path
+          description: ID of field
+          required: true
+          schema:
+            title: FieldId
+            description: The field to search in
+            type: string
+            example: first_name
+        - name: searchValue
+          in: path
+          description: The value to search for
+          required: true
+          schema:
+            title: SearchValue
+            description: The value to search for
+            type: string
+            example: foo
+        - in: query
+          name: pageSize
+          schema:
+            type: integer
+          description: Number of records to return in a page (default 1000 if pageNumber included)
+        - in: query
+          name: pageNumber
+          schema:
+            type: integer
+          description: 'Based on pageSize, which page of records to return'
+      responses:
+        '200':
+          $ref: '#/components/responses/RecordsResponse'
+        '400':
+          $ref: '#/components/responses/Error'
+        '404':
+          $ref: '#/components/responses/Error'
+  '/workbooks/{workbookId}/sheets/{sheetId}/fields/{fieldId}/replace/{searchValue}':
+    put:
+      tags:
+        - Workbooks & Sheets
+      operationId: replace
+      summary: Find and replace a value in a field
+      description: Searches for the given searchValue in a field and replaces all instances of that value with replaceValue
+      security:
+        - BearerAuth: []
+      parameters:
+        - name: workbookId
+          in: path
+          description: ID of workbook
+          required: true
+          schema:
+            $ref: '#/components/schemas/WorkbookId'
+        - name: sheetId
+          in: path
+          description: ID of sheet
+          required: true
+          schema:
+            $ref: '#/components/schemas/SheetId'
+        - name: fieldId
+          in: path
+          description: ID of field
+          required: true
+          schema:
+            title: FieldId
+            description: The field to search in
+            type: string
+            example: first_name
+        - name: searchValue
+          in: path
+          description: The value to search for
+          required: true
+          schema:
+            title: SearchValue
+            description: The value to search for
+            type: string
+            example: foo
+        - in: query
+          name: pageSize
+          schema:
+            type: integer
+          description: Number of records to return in a page (default 1000 if pageNumber included)
+        - in: query
+          name: pageNumber
+          schema:
+            type: integer
+          description: 'Based on pageSize, which page of records to return'
+      requestBody:
+        $ref: '#/components/requestBodies/RecordsReplace'
+      responses:
+        '200':
+          $ref: '#/components/responses/RecordsResponse'
+        '400':
+          $ref: '#/components/responses/Error'
+        '404':
+          $ref: '#/components/responses/Error'
+  '/workbooks/{workbookId}/sheets/{sheetId}/versions':
+    post:
+      tags:
+        - Workbooks & Sheets
+      operationId: createVersion
+      summary: Create a version
+      description: Creates a new version of a workbook sheet
+      security:
+        - BearerAuth: []
+      parameters:
+        - name: workbookId
+          in: path
+          description: ID of workbook
+          required: true
+          schema:
+            $ref: '#/components/schemas/WorkbookId'
+        - name: sheetId
+          in: path
+          description: ID of sheet
+          required: true
+          schema:
+            $ref: '#/components/schemas/SheetId'
+      responses:
+        '201':
+          $ref: '#/components/responses/Version'
+        '400':
+          $ref: '#/components/responses/Error'
+        '404':
+          $ref: '#/components/responses/Error'
+components:
+  securitySchemes:
+    BearerAuth:
+      type: http
+      scheme: bearer
+  requestBodies:
+    Credentials:
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Credentials'
+      description: Credentials to authenticate an user
+      required: true
+    AccessTokenCredentials:
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              clientId:
+                type: string
+                description: Client ID generated for auth
+              secret:
+                type: string
+                description: Secret generated for auth
+    Document:
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/DocumentConfig'
+      description: Document object belonging to a Space
+      required: true
+    RecordsData:
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/RecordsData'
+      description: Record data to insert in a sheet
+      required: true
+    RecordsUpdates:
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/RecordsUpdates'
+      description: Record data to insert in a sheet
+      required: true
+    RecordsReplace:
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              replace:
+                description: The value to replace found values with
+      description: Data to replace found values with
+      required: true
+    SpacePattern:
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/SpacePatternConfig'
+      description: Request body object used to create a space config
+      required: true
+    Space:
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/SpaceConfig'
+      description: Request body object used to create a space
+      required: true
+    Environment:
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/EnvironmentConfig'
+      description: Request body object used to create a environment
+      required: true
+    File:
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/FileConfig'
+      description: Request body object used to update a file
+      required: true
+    UploadFile:
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              spaceId:
+                $ref: '#/components/schemas/SpaceId'
+              environmentId:
+                $ref: '#/components/schemas/EnvironmentId'
+              file:
+                type: string
+                format: binary
+                description: A binary payload containing the file contents
+        multipart/form-data:
+          schema:
+            type: object
+            properties:
+              spaceId:
+                $ref: '#/components/schemas/SpaceId'
+              environmentId:
+                $ref: '#/components/schemas/EnvironmentId'
+              file:
+                type: string
+                format: binary
+                description: A binary payload containing the file contents
+      description: Request body object used to create a file
+      required: true
+    Job:
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/JobConfig'
+      description: Job that will be added
+      required: true
+    Plan:
+      content:
+        application/json:
+          schema:
+            allOf:
+              - $ref: '#/components/schemas/Plan'
+            properties:
+              fileId:
+                $ref: '#/components/schemas/FileId'
+              jobId:
+                $ref: '#/components/schemas/JobId'
+      description: The execution plan for the job
+      required: true
+    WorkbookConfig:
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/WorkbookConfig'
+      description: The configurations for the workbook
+      required: true
+    User:
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/UserConfig'
+      description: Configurations for the user
+      required: true
+    Guest:
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/GuestConfig'
+      description: Configurations for the guest
+      required: true
+    Guests:
+      content:
+        application/json:
+          schema:
+            type: array
+            items:
+              $ref: '#/components/schemas/GuestConfig'
+            minItems: 1
+      description: Configurations for the guests
+      required: true
+    Invite:
+      content:
+        application/json:
+          schema:
+            type: array
+            items:
+              type: object
+              required:
+                - guestId
+                - spaceId
+              properties:
+                guestId:
+                  $ref: '#/components/schemas/GuestId'
+                spaceId:
+                  $ref: '#/components/schemas/SpaceId'
+                message:
+                  type: string
+                  description: Message to send with the invite
+      description: Configurations for the guest
+      required: true
+    Token:
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              token:
+                type: string
+                description: The token to use for the request
+    Event:
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/EventConfig'
+      description: Configurations for the event
+      required: true
+    Agent:
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/AgentConfig'
+        multipart/form-data:
+          schema:
+            $ref: '#/components/schemas/AgentConfig'
+      description: Configurations for the agent
+      required: true
+  responses:
+    Health:
+      content:
+        application/json:
+          schema:
+            title: HealthResponse
+            type: object
+            properties:
+              status:
+                type: string
+                description: Ok
+                example: ok
+      description: Health status of the service
+    AccessToken:
+      description: AccessToken response
+      content:
+        application/json:
+          schema:
+            title: AccessTokenResponse
+            type: object
+            properties:
+              data:
+                $ref: '#/components/schemas/AccessToken'
+    EventToken:
+      description: EventToken response
+      content:
+        application/json:
+          schema:
+            title: EventTokenResponse
+            type: object
+            properties:
+              data:
+                $ref: '#/components/schemas/EventToken'
+    ApiToken:
+      description: ApiToken response
+      content:
+        application/json:
+          schema:
+            title: ApiTokenResponse
+            type: object
+            properties:
+              data:
+                $ref: '#/components/schemas/ApiToken'
+    ApiTokens:
+      description: List of api tokens without secrets
+      content:
+        application/json:
+          schema:
+            title: ApiTokensResponse
+            type: object
+            properties:
+              pagination:
+                $ref: '#/components/schemas/Pagination'
+              data:
+                type: array
+                items:
+                  $ref: '#/components/schemas/ApiToken'
+    Error:
+      description: Error response
+      content:
+        application/json:
+          schema:
+            title: ErrorResponse
+            type: object
+            properties:
+              errors:
+                type: array
+                items:
+                  type: object
+                  required:
+                    - message
+                  properties:
+                    key:
+                      type: string
+                      description: Object type
+                      example: '123'
+                    message:
+                      type: string
+                      description: The message of the error
+                      example: ID 123 not found
+    JobStats:
+      description: Jobs stats response
+      content:
+        application/json:
+          schema:
+            title: JobStatsResponse
+            type: object
+            properties:
+              data:
+                $ref: '#/components/schemas/JobStats'
+    Event:
+      description: A single Event response
+      content:
+        application/json:
+          schema:
+            title: EventResponse
+            type: object
+            properties:
+              data:
+                $ref: '#/components/schemas/Event'
+    Events:
+      description: List of Events response
+      content:
+        application/json:
+          schema:
+            title: EventsResponse
+            type: object
+            properties:
+              data:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Event'
+    Agent:
+      description: Agent response
+      content:
+        application/json:
+          schema:
+            title: AgentResponse
+            type: object
+            properties:
+              data:
+                $ref: '#/components/schemas/Agent'
+    Agents:
+      description: Agents response
+      content:
+        application/json:
+          schema:
+            title: AgentsResponse
+            type: object
+            properties:
+              data:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Agent'
+    EnvironmentStats:
+      description: Agent stats response
+      content:
+        application/json:
+          schema:
+            title: EnvironmentStatsResponse
+            type: object
+            properties:
+              data:
+                type: object
+                properties:
+                  agentExecutions:
+                    $ref: '#/components/schemas/AgentStats'
+    Files:
+      description: List of Files response
+      content:
+        application/json:
+          schema:
+            title: FilesResponse
+            type: object
+            properties:
+              data:
+                type: array
+                items:
+                  $ref: '#/components/schemas/File'
+    Job:
+      description: Job response
+      content:
+        application/json:
+          schema:
+            title: JobResponse
+            type: object
+            properties:
+              data:
+                $ref: '#/components/schemas/Job'
+    Jobs:
+      description: List of Job objects
+      content:
+        application/json:
+          schema:
+            title: JobsResponse
+            type: object
+            properties:
+              data:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Job'
+    JobPlan:
+      description: Job configuration response
+      content:
+        application/json:
+          schema:
+            title: JobPlanResponse
+            type: object
+            properties:
+              data:
+                $ref: '#/components/schemas/JobPlan'
+    Workbook:
+      description: Workbook response
+      content:
+        application/json:
+          schema:
+            title: WorkbookResponse
+            type: object
+            properties:
+              data:
+                $ref: '#/components/schemas/Workbook'
+    Workbooks:
+      description: Workbooks response
+      content:
+        application/json:
+          schema:
+            title: WorkbooksResponse
+            type: object
+            properties:
+              data:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Workbook'
+    RecordsResponse:
+      description: Records Response
+      content:
+        application/json:
+          schema:
+            title: RecordsResponse
+            type: object
+            properties:
+              data:
+                $ref: '#/components/schemas/RecordsResponseData'
+    Fields:
+      description: List of Fields objects
+      content:
+        application/json:
+          schema:
+            title: FieldsResponse
+            type: object
+            properties:
+              data:
+                $ref: '#/components/schemas/FieldResponse'
+    Version:
+      description: Version response
+      content:
+        application/json:
+          schema:
+            title: VersionResponse
+            type: object
+            properties:
+              data:
+                type: object
+                properties:
+                  versionId:
+                    $ref: '#/components/schemas/VersionId'
+    Sheet:
+      description: Sheet response
+      content:
+        application/json:
+          schema:
+            title: SheetResponse
+            type: object
+            properties:
+              data:
+                $ref: '#/components/schemas/Sheet'
+    Sheets:
+      description: List of Sheet objects
+      content:
+        application/json:
+          schema:
+            title: SheetsResponse
+            type: object
+            properties:
+              data:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Sheet'
+    Space:
+      description: Space response
+      content:
+        application/json:
+          schema:
+            title: SpaceResponse
+            type: object
+            properties:
+              data:
+                $ref: '#/components/schemas/Space'
+    Spaces:
+      description: List of Space objects
+      content:
+        application/json:
+          schema:
+            title: SpacesResponse
+            type: object
+            properties:
+              pagination:
+                $ref: '#/components/schemas/Pagination'
+              data:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Space'
+    Environment:
+      description: Environment response
+      content:
+        application/json:
+          schema:
+            title: EnvironmentResponse
+            type: object
+            properties:
+              data:
+                $ref: '#/components/schemas/Environment'
+    File:
+      description: File response
+      content:
+        application/json:
+          schema:
+            title: FileResponse
+            type: object
+            required:
+              - data
+            properties:
+              data:
+                $ref: '#/components/schemas/File'
+    DownloadFile:
+      content:
+        application/json:
+          schema:
+            type: string
+            format: binary
+            description: A binary payload containing the file contents
+        multipart/form-data:
+          schema:
+            type: string
+            format: binary
+            description: A binary payload containing the file contents
+      description: Response containing a file
+    DownloadCsv:
+      content:
+        text/csv:
+          schema:
+            type: string
+            format: binary
+            description: A binary payload containing the exported csv file
+      description: Response containing an exported csv file
+    Environments:
+      description: List of Environment objects
+      content:
+        application/json:
+          schema:
+            title: EnvironmentsResponse
+            type: object
+            properties:
+              data:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Environment'
+    SpacePatterns:
+      description: List of Space patterns
+      content:
+        application/json:
+          schema:
+            title: SpaceConfigsResponse
+            type: object
+            properties:
+              data:
+                type: array
+                items:
+                  $ref: '#/components/schemas/SpacePattern'
+    SpacePattern:
+      description: Space pattern response
+      content:
+        application/json:
+          schema:
+            title: SpaceConfigResponse
+            type: object
+            properties:
+              data:
+                $ref: '#/components/schemas/SpacePattern'
+    Document:
+      description: Document response
+      content:
+        application/json:
+          schema:
+            title: DocumentResponse
+            type: object
+            properties:
+              data:
+                $ref: '#/components/schemas/Document'
+    Documents:
+      description: Documents response
+      content:
+        application/json:
+          schema:
+            title: DocumentsResponse
+            type: object
+            properties:
+              data:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Document'
+    User:
+      description: User response
+      content:
+        application/json:
+          schema:
+            title: UserResponse
+            type: object
+            properties:
+              data:
+                $ref: '#/components/schemas/User'
+    Users:
+      description: List of User objects
+      content:
+        application/json:
+          schema:
+            title: UsersResponse
+            type: object
+            properties:
+              data:
+                type: array
+                items:
+                  $ref: '#/components/schemas/User'
+    Guest:
+      description: Guest response
+      content:
+        application/json:
+          schema:
+            title: GuestResponse
+            type: object
+            properties:
+              data:
+                $ref: '#/components/schemas/Guest'
+    Guests:
+      description: List of Guest objects
+      content:
+        application/json:
+          schema:
+            title: GuestsResponse
+            type: object
+            properties:
+              data:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Guest'
+    AgentLogs:
+      description: Agent Logs response
+      content:
+        application/json:
+          schema:
+            title: AgentLogsResponse
+            type: object
+            properties:
+              pagination:
+                $ref: '#/components/schemas/Pagination'
+              data:
+                type: array
+                items:
+                  $ref: '#/components/schemas/AgentLog'
+    Exchange:
+      description: Exchange token response
+      content:
+        application/json:
+          schema:
+            title: ExchangeTokenResponse
+            type: object
+            properties:
+              data:
+                type: object
+                required:
+                  - valid
+                properties:
+                  valid:
+                    type: boolean
+                    description: Whether the provided token was valid
+                    example: true
+                  token:
+                    type: string
+                    description: 'The refreshed token, if the provided token was valid'
+                  sentTo:
+                    type: string
+                    description: 'The email address the recovery email was sent to, if the provided token was not valid'
+                    example: john.doe@example.com
+    Success:
+      description: Success response
+      content:
+        application/json:
+          schema:
+            title: SuccessResponse
+            type: object
+            properties:
+              data:
+                $ref: '#/components/schemas/Success'
+  schemas:
+    AccountId:
+      title: AccountId
+      description: Account ID
+      type: string
+      example: us_acc_uj6s91wc
+    UserId:
+      title: UserId
+      description: User ID
+      type: string
+      example: us_usr_a7Ws9cue
+    GuestId:
+      title: GuestId
+      description: Guest ID
+      type: string
+      example: us_g_5ue7P9cU
+    EnvironmentId:
+      title: EnvironmentId
+      description: Environment ID
+      type: string
+      example: us_env_hVXkXs0b
+    AgentId:
+      title: AgentId
+      description: Agent ID
+      type: string
+      example: us_ag_qGZbKwDW
+    FileId:
+      title: FileId
+      description: File ID
+      type: string
+      example: us_fl_qGZbKwDW
+    DocumentId:
+      title: DocumentId
+      description: Document ID
+      type: string
+      example: us_dc_KwDW6cfH
+    SpaceId:
+      title: SpaceId
+      description: Space ID
+      type: string
+      example: us_sp_DrdXetPN
+    SpaceConfigId:
+      title: SpaceConfigId
+      description: Space Config ID
+      type: string
+      example: us_sc_uj691wck
+    WorkbookId:
+      title: WorkbookId
+      description: Workbook ID
+      type: string
+      example: us_wb_qGZbKwDW
+    SheetId:
+      title: SheetId
+      description: Sheet ID
+      type: string
+      example: us_sh_fHfzjzHb
+    SheetSlug:
+      title: SheetSlug
+      description: Sheet Slug
+      type: string
+      example: test/mySheet
+    FieldId:
+      title: FieldId
+      description: Field ID
+      type: string
+      example: additionalProp1
+    VersionId:
+      title: VersionId
+      description: Version ID
+      type: string
+      example: us_vr_jte4tzVn
+    JobId:
+      title: JobId
+      description: Pipeline Job ID
+      type: string
+      example: us_jb_UQg89Drd
+    RecordId:
+      title: RecordId
+      description: Record ID
+      type: string
+      example: us_rc_a7W9cuesESa7W9cu
+    EventId:
+      title: EventId
+      description: Event ID
+      type: string
+      example: us_evt_9cuesESa7W9cuesE
+    Success:
+      title: Success
+      description: Informs whether or not a request was successful
+      type: object
+      required:
+        - success
+      properties:
+        success:
+          type: boolean
+    Pagination:
+      title: Pagination
+      description: pagination info
+      type: object
+      required:
+        - currentPage
+        - pageCount
+        - totalCount
+      properties:
+        currentPage:
+          type: number
+          description: current page of results
+        pageCount:
+          type: number
+          description: total number of pages of results
+        totalCount:
+          type: number
+          description: total available results
+    Validation:
+      title: Validation
+      description: Validation response on input sanitation of user input
+      type: object
+      required:
+        - success
+      properties:
+        success:
+          type: boolean
+        errors:
+          type: array
+          items:
+            type: string
+    ActionName:
+      title: ActionName
+      description: Name of an action
+      type: string
+      example: download
+    Credentials:
+      title: Credentials
+      description: Properties used to authenticate an user
+      type: object
+      required:
+        - email
+        - password
+      properties:
+        email:
+          type: string
+          example: flatfile@example.com
+        password:
+          type: string
+          example: Sw0rdf1sh
+    AccessToken:
+      title: AccessToken
+      description: Properties used to allow users to request our private services
+      type: object
+      required:
+        - accessToken
+        - expiresIn
+        - expires
+      properties:
+        accessToken:
+          type: string
+          example: AYjcyMzY3ZDhiNmJkNTY
+        expiresIn:
+          type: string
+          example: '86400'
+        expires:
+          type: string
+          example: '2022-09-18T00:19:57.007Z'
+    EventToken:
+      title: EventToken
+      description: Properties used to allow users to connect to the event bus
+      type: object
+      required:
+        - eventToken
+        - expiresIn
+        - expires
+      properties:
+        accountId:
+          $ref: '#/components/schemas/AccountId'
+        subscribeKey:
+          type: string
+          description: The id of the event bus to subscribe to
+          example: sub-c-a0be4bbc-3767-494e-9202-bc4862b03ef0
+        ttl:
+          type: number
+          description: Time to live in minutes
+          example: 15
+        token:
+          type: string
+          example: p0AkFl043rhDdHRsple3KgQ3NwY6BDcENnctokenVzcqBDczaWdYIGOAeTyWGJI
+    ApiToken:
+      title: ApiToken
+      description: Client id and secret used for authenticating against our APIs
+      type: object
+      required:
+        - clientId
+        - description
+        - metadata
+        - createdAt
+      properties:
+        clientId:
+          type: string
+        description:
+          type: string
+        metadata:
+          type: object
+        createdAt:
+          type: string
+          example: '2022-09-18T00:19:57.007Z'
+        secret:
+          type: string
+    User:
+      title: User
+      description: User object
+      type: object
+      allOf:
+        - $ref: '#/components/schemas/UserConfig'
+      required:
+        - id
+      properties:
+        id:
+          $ref: '#/components/schemas/UserId'
+    UserConfig:
+      title: UserConfig
+      description: Properties used to create a new user
+      type: object
+      required:
+        - id
+        - email
+        - name
+        - accountId
+      properties:
+        email:
+          type: string
+          example: flatfile@example.com
+        name:
+          type: string
+          example: Mr. Flatfile
+        accountId:
+          $ref: '#/components/schemas/AccountId'
+    Guest:
+      title: Guest
+      description: Guest object
+      type: object
+      allOf:
+        - $ref: '#/components/schemas/GuestConfig'
+      required:
+        - id
+      properties:
+        id:
+          $ref: '#/components/schemas/GuestId'
+    GuestConfig:
+      title: GuestConfig
+      description: Properties used to create a new guest
+      type: object
+      required:
+        - environmentId
+        - email
+        - name
+        - spaces
+      properties:
+        environmentId:
+          $ref: '#/components/schemas/EnvironmentId'
+        email:
+          type: string
+          example: guest@example.com
+        name:
+          type: string
+          example: Mr. Guest
+        spaces:
+          type: array
+          items:
+            type: object
+            required:
+              - id
+            properties:
+              id:
+                $ref: '#/components/schemas/SpaceId'
+              lastAccessed:
+                type: string
+                format: date-time
+                example: '2022-09-18T00:19:57.007Z'
+          minItems: 1
+    Environment:
+      title: Environment
+      description: The base object that holds all spaces
+      type: object
+      allOf:
+        - $ref: '#/components/schemas/EnvironmentConfig'
+      required:
+        - id
+      properties:
+        id:
+          $ref: '#/components/schemas/EnvironmentId'
+        accountId:
+          $ref: '#/components/schemas/AccountId'
+    EnvironmentConfig:
+      title: EnvironmentConfig
+      description: Properties used to create a new environment
+      type: object
+      required:
+        - name
+        - isProd
+      properties:
+        name:
+          type: string
+          description: The name of the environment
+          example: dev
+        isProd:
+          type: boolean
+          description: Whether or not the environment is a production environment
+          example: false
+        newSpacesInherit:
+          type: boolean
+          description: 'Whether or not new spaces have the option to copy files and guests from existing spaces, defaults to false'
+          example: false
+        guestAuthentication:
+          type: array
+          items:
+            type: string
+            description: The type of authentication to use for guests
+            enum:
+              - shared_link
+              - magic_link
+            example: magic_link
+    Document:
+      title: Document
+      description: A document (markdown components) belong to a space
+      type: object
+      allOf:
+        - $ref: '#/components/schemas/DocumentConfig'
+      required:
+        - id
+      properties:
+        id:
+          $ref: '#/components/schemas/DocumentId'
+        spaceId:
+          $ref: '#/components/schemas/SpaceId'
+    DocumentConfig:
+      title: DocumentConfig
+      description: Properties used to create a new document
+      type: object
+      required:
+        - title
+        - body
+      properties:
+        title:
+          type: string
+          example: Getting Started
+        body:
+          type: string
+          example: This is a markdown body
+    Space:
+      title: Space
+      description: A place to store your workbooks
+      type: object
+      allOf:
+        - $ref: '#/components/schemas/SpaceConfig'
+      required:
+        - id
+      properties:
+        id:
+          $ref: '#/components/schemas/SpaceId'
+        workbooksCount:
+          type: integer
+          description: Amount of workbooks in the space
+          example: 0
+        filesCount:
+          type: integer
+          description: Amount of files in the space
+          example: 0
+        createdByUserId:
+          $ref: '#/components/schemas/UserId'
+        createdByUserName:
+          type: string
+          description: User name who created space
+          example: Mr. Flatfile
+        guestLink:
+          type: string
+          description: Guest link to the space
+          example: 'https://app.flatfile.io/space/1234?token=5678'
+    GetSpacesSortField:
+      type: string
+      enum:
+        - name
+        - workbooksCount
+        - filesCount
+        - environmentId
+        - createdByUserName
+    SpaceConfig:
+      title: SpaceConfig
+      description: Properties used to create a new Space
+      type: object
+      required:
+        - spaceConfigId
+        - environmentId
+      properties:
+        spaceConfigId:
+          $ref: '#/components/schemas/SpaceConfigId'
+        environmentId:
+          $ref: '#/components/schemas/EnvironmentId'
+        primaryWorkbookId:
+          $ref: '#/components/schemas/WorkbookId'
+        name:
+          type: string
+          description: The name of the space
+          example: My Space
+        displayOrder:
+          type: integer
+          description: The display order
+          example: 1
+        sidebarConfigs:
+          type: array
+          title: json array of the different configs on a space
+          items:
+            $ref: '#/components/schemas/SidebarConfig'
+        actions:
+          type: array
+          items:
+            $ref: '#/components/schemas/Properties_Action'
+    SpacePattern:
+      title: SpacePattern
+      description: Properties used to create a new Space Config
+      type: object
+      allOf:
+        - $ref: '#/components/schemas/SpacePatternConfig'
+      required:
+        - id
+      properties:
+        id:
+          $ref: '#/components/schemas/SpaceConfigId'
+    SpacePatternConfig:
+      title: SpaceConfigPattern
+      description: Properties used to create a new Space Config
+      type: object
+      required:
+        - slug
+        - name
+        - blueprints
+      properties:
+        slug:
+          type: string
+          example: persistent-slug
+        name:
+          type: string
+          example: Editable Name
+        blueprints:
+          type: array
+          items:
+            $ref: '#/components/schemas/Blueprint'
+        actions:
+          type: array
+          items:
+            $ref: '#/components/schemas/Properties_Action'
+    Blueprint:
+      title: Blueprint
+      description: Properties used to create a new Blueprint
+      type: object
+      required:
+        - slug
+        - name
+        - sheets
+      properties:
+        slug:
+          type: string
+          example: persistent-slug
+        name:
+          type: string
+          example: Blueprint name
+        primary:
+          type: boolean
+          default: false
+        sheets:
+          type: array
+          items:
+            $ref: '#/components/schemas/SheetConfig'
+    SidebarConfig:
+      oneOf:
+        - $ref: '#/components/schemas/WorkbookSidebarConfig'
+        - $ref: '#/components/schemas/DocumentSidebarConfig'
+        - $ref: '#/components/schemas/LinkSidebarConfig'
+      discriminator:
+        propertyName: type
+        mapping:
+          workbook: '#/components/schemas/WorkbookSidebarConfig'
+          document: '#/components/schemas/DocumentSidebarConfig'
+          link: '#/components/schemas/LinkSidebarConfig'
+    BaseSideBarConfig:
+      type: object
+      properties:
+        type:
+          type: string
+          default: string
+          enum:
+            - workbook
+            - document
+            - link
+    WorkbookSidebarConfig:
+      allOf:
+        - $ref: '#/components/schemas/BaseSideBarConfig'
+        - type: object
+          required:
+            - workbookId
+          properties:
+            workbookId:
+              $ref: '#/components/schemas/WorkbookId'
+    DocumentSidebarConfig:
+      allOf:
+        - $ref: '#/components/schemas/BaseSideBarConfig'
+        - type: object
+          required:
+            - documentId
+          properties:
+            documentId:
+              $ref: '#/components/schemas/DocumentId'
+    LinkSidebarConfig:
+      allOf:
+        - $ref: '#/components/schemas/BaseSideBarConfig'
+        - type: object
+          required:
+            - href
+            - title
+          properties:
+            href:
+              type: string
+              description: http url of the link
+            title:
+              type: string
+              description: Space the file should be uploaded to
+    FileConfig:
+      title: FileConfig
+      description: Properties used to update a file
+      type: object
+      properties:
+        workbookId:
+          $ref: '#/components/schemas/WorkbookId'
+        status:
+          $ref: '#/components/schemas/ModelFileStatusEnum'
+      additionalProperties: false
+    File:
+      title: File
+      description: Any uploaded file of any type
+      type: object
+      required:
+        - id
+        - name
+        - ext
+        - mimetype
+        - encoding
+        - status
+        - size
+        - bytesReceived
+        - spaceId
+      properties:
+        id:
+          $ref: '#/components/schemas/FileId'
+        name:
+          description: Original filename
+          example: foobar.csv
+          type: string
+        ext:
+          description: Extension of the file
+          example: csv
+          type: string
+        mimetype:
+          description: MIME Type of the file
+          example: text/csv
+          type: string
+        encoding:
+          description: Text encoding of the file
+          example: ascii
+          type: string
+        status:
+          $ref: '#/components/schemas/ModelFileStatusEnum'
+        size:
+          description: Size of file in bytes
+          example: 1452
+          type: integer
+        bytesReceived:
+          description: Number of bytes that have been uploaded so far (useful for progress tracking)
+          example: 702
+          type: integer
+        spaceId:
+          $ref: '#/components/schemas/SpaceId'
+        workbookId:
+          $ref: '#/components/schemas/WorkbookId'
+        createdAt:
+          description: Date the file was created
+          example: '2022-09-11T18:04:35.979Z'
+          type: string
+        updatedAt:
+          description: Date the file was last updated
+          example: '2022-09-11T18:04:35.979Z'
+          type: string
+    ModelFileStatusEnum:
+      description: Status of the file
+      example: complete
+      type: string
+      enum:
+        - partial
+        - complete
+        - archived
+        - purged
+    EventConfig:
+      title: EventConfig
+      description: Properties used to create a new event
+      type: object
+      required:
+        - domain
+        - topic
+        - context
+        - payload
+      properties:
+        domain:
+          type: string
+          description: The domain of the event
+          enum:
+            - file
+            - space
+            - workbook
+            - job
+        topic:
+          $ref: '#/components/schemas/EventTopic'
+        context:
+          type: object
+          required:
+            - accountId
+            - environmentId
+          description: The context of the event
+          properties:
+            actionName:
+              $ref: '#/components/schemas/ActionName'
+            accountId:
+              $ref: '#/components/schemas/AccountId'
+            environmentId:
+              $ref: '#/components/schemas/EnvironmentId'
+            spaceId:
+              $ref: '#/components/schemas/SpaceId'
+            workbookId:
+              $ref: '#/components/schemas/WorkbookId'
+            sheetId:
+              $ref: '#/components/schemas/SheetId'
+            sheetSlug:
+              $ref: '#/components/schemas/SheetSlug'
+            versionId:
+              $ref: '#/components/schemas/VersionId'
+            jobId:
+              $ref: '#/components/schemas/JobId'
+            fileId:
+              $ref: '#/components/schemas/FileId'
+            precedingEventId:
+              $ref: '#/components/schemas/EventId'
+        attributes:
+          type: object
+          description: The attributes of the event
+          properties:
+            progress:
+              type: object
+              description: The progress of the event within a collection of iterable events
+              properties:
+                current:
+                  type: integer
+                  description: The current progress of the event
+                  example: 3
+                total:
+                  type: integer
+                  description: The total number of events in this group
+                  example: 5
+                percent:
+                  type: integer
+                  description: The percent complete of the event group
+                  example: 60
+        payload:
+          description: Payload of the event
+          type: object
+          example:
+            recordsAdded: 100
+        callbackUrl:
+          type: string
+          description: The callback url to acknowledge the event
+          example: 'https://api.us.flatfile.com/v1/events/us_ev_9cuesESa7W9cuesESa7W9cuesES/ack'
+        dataUrl:
+          type: string
+          description: The url to retrieve the data associated with the event
+          example: 'https://api.us.flatfile.com/v1/workbooks/us_wb_qGZbKwDW/sheets/us_sh_fHfzjzHb/records'
+        createdAt:
+          description: Date the event was created
+          type: string
+          format: date-time
+        acknowledgedAt:
+          description: Date the event was acknowledged
+          type: string
+          format: date-time
+        acknowledgedBy:
+          description: The actor (user or system) who acknowledged the event
+          type: string
+          example: us_usr_a7Ws9cue
+    Event:
+      title: Event
+      description: An event that tracks an activity within Flatfile
+      type: object
+      allOf:
+        - $ref: '#/components/schemas/EventConfig'
+      required:
+        - id
+      properties:
+        id:
+          $ref: '#/components/schemas/EventId'
+    Action:
+      $ref: '#/components/schemas/Properties_Action'
+    EventTopic:
+      type: string
+      description: The topic of the event
+      enum:
+        - 'space:added'
+        - 'space:removed'
+        - 'workbook:added'
+        - 'workbook:removed'
+        - 'user:added'
+        - 'user:removed'
+        - 'user:online'
+        - 'user:offline'
+        - 'upload:started'
+        - 'upload:failed'
+        - 'upload:completed'
+        - 'job:started'
+        - 'job:waiting'
+        - 'job:updated'
+        - 'job:failed'
+        - 'job:completed'
+        - 'job:deleted'
+        - 'records:created'
+        - 'records:updated'
+        - 'records:deleted'
+        - 'sheet:validated'
+        - 'file:deleted'
+        - 'action:triggered'
+    Agent:
+      title: Agent
+      description: An agent that can listen for events and execute actions
+      type: object
+      allOf:
+        - $ref: '#/components/schemas/AgentConfig'
+      required:
+        - id
+      properties:
+        id:
+          $ref: '#/components/schemas/AgentId'
+    AgentConfig:
+      title: AgentConfig
+      description: Properties used to create a new agent
+      type: object
+      properties:
+        topics:
+          type: array
+          description: The topics the agent should listen for
+          items:
+            $ref: '#/components/schemas/EventTopic'
+        compiler:
+          type: string
+          description: The compiler of the agent
+          enum:
+            - js
+        source:
+          type: string
+          description: The source of the agent
+          example: 'module.exports = { routeEvent: async (...args) => { console.log(args) } }'
+    AgentLog:
+      title: AgentLog
+      description: A log of an agent execution
+      type: object
+      required:
+        - eventId
+        - createdAt
+        - success
+      properties:
+        eventId:
+          $ref: '#/components/schemas/EventId'
+        success:
+          type: boolean
+          description: Whether the agent execution was successful
+          example: true
+        createdAt:
+          type: string
+          example: '2022-09-18T00:19:57.007Z'
+        log:
+          type: string
+          description: The log of the agent execution
+          example: SUCCESS
+    Job:
+      title: Job
+      description: A single unit of work that will execute asynchronously
+      type: object
+      allOf:
+        - $ref: '#/components/schemas/JobConfig'
+      required:
+        - id
+      properties:
+        id:
+          $ref: '#/components/schemas/JobId'
+    JobConfig:
+      title: JobConfig
+      description: A single unit of work that a pipeline will execute
+      type: object
+      required:
+        - type
+        - source
+      properties:
+        type:
+          type: string
+          description: The type of job
+          enum:
+            - file
+            - workbook
+        operation:
+          type: string
+          description: the type of operation to perform on the data
+          enum:
+            - extract
+            - map
+            - delete-records
+        source:
+          $ref: '#/components/schemas/FileOrWorkbookId'
+        destination:
+          $ref: '#/components/schemas/WorkbookId'
+        config:
+          oneOf:
+            - $ref: '#/components/schemas/DeleteJobConfig'
+            - $ref: '#/components/schemas/FileJobConfig'
+            - $ref: '#/components/schemas/PipelineJobConfig'
+        trigger:
+          type: string
+          description: the type of trigger to use for this job
+          enum:
+            - manual
+            - immediate
+        status:
+          type: string
+          description: the status of the job
+          enum:
+            - planning
+            - ready
+            - executing
+            - complete
+            - failed
+          example: complete
+        progress:
+          type: number
+          description: the progress of the job
+          example: 100
+    JobSource:
+      $ref: '#/components/schemas/FileOrWorkbookId'
+    FileOrWorkbookId:
+      title: FileOrWorkbookId
+      description: The id of a file or workbook
+      type: string
+      example: us_fl_qGZbKwDW
+    JobDestination:
+      $ref: '#/components/schemas/WorkbookId'
+    DeleteJobConfig:
+      title: DeleteJobConfig
+      description: The configuration for a delete job
+      type: object
+      required:
+        - filter
+        - sheet
+      properties:
+        filter:
+          $ref: '#/components/schemas/Filter'
+        filterField:
+          type: string
+          description: Name of field by which to filter records
+        sheet:
+          $ref: '#/components/schemas/SheetId'
+        exceptions:
+          type: array
+          items:
+            $ref: '#/components/schemas/RecordId'
+    FileJobConfig:
+      type: object
+      required:
+        - driver
+      properties:
+        driver:
+          type: string
+          description: The driver to use for extracting data from the file
+          enum:
+            - csv
+    PipelineJobConfig:
+      type: object
+      required:
+        - sourceSheetId
+        - destinationSheetId
+      properties:
+        sourceSheetId:
+          $ref: '#/components/schemas/SheetId'
+        destinationSheetId:
+          $ref: '#/components/schemas/SheetId'
+    Plan:
+      type: object
+      title: JobExecutionPlan
+      description: 'The execution plan for a job, for example, for a map job, the execution plan is the mapping of the source sheet to the destination sheet.'
+      properties:
+        fieldMapping:
+          type: array
+          title: Edges
+          items:
+            type: object
+            title: Edge
+            required:
+              - sourceField
+              - destinationField
+            properties:
+              sourceField:
+                $ref: '#/components/schemas/Properties_Property'
+              destinationField:
+                $ref: '#/components/schemas/Properties_Property'
+              preview:
+                type: array
+                items:
+                  type: string
+                  example: George Washington
+              enumDetails:
+                type: object
+                title: EnumDetails
+                description: Only available if one or more of the destination fields is of type enum. Provides category mapping.
+                properties:
+                  mapping:
+                    type: array
+                    title: EnumMapping
+                    items:
+                      type: object
+                      title: EnumMappingField
+                      properties:
+                        sourceValue:
+                          type: string
+                          nullable: true
+                        destinationValue:
+                          type: string
+                          nullable: true
+                  unusedSourceValues:
+                    type: array
+                    items:
+                      type: string
+                      nullable: true
+                  unusedDestinationValues:
+                    type: array
+                    items:
+                      type: string
+                      nullable: true
+              metadata:
+                type: object
+                properties:
+                  certainty:
+                    type: string
+                    enum:
+                      - absolute
+                      - strong
+                      - moderate
+                      - weak
+                  source:
+                    type: string
+        unmappedSourceFields:
+          type: array
+          title: SourceFields
+          items:
+            type: object
+            title: SourceField
+            required:
+              - sourceField
+            properties:
+              sourceField:
+                $ref: '#/components/schemas/Properties_Property'
+              preview:
+                type: array
+                items:
+                  type: string
+                  example: George Washington
+        unmappedDestinationFields:
+          type: array
+          title: DestinationFields
+          items:
+            type: object
+            title: DestinationField
+            required:
+              - destinationField
+            properties:
+              enumDetails:
+                type: object
+                title: EnumDetails
+                description: Only available if one or more of the destination fields is of type enum. Provides category mapping.
+                properties:
+                  mapping:
+                    type: array
+                    title: EnumMapping
+                    items:
+                      type: object
+                      title: EnumMappingField
+                      properties:
+                        sourceValue:
+                          type: string
+                        destinationValue:
+                          type: string
+                  unusedSourceValues:
+                    type: array
+                    items:
+                      type: string
+                  unusedDestinationValues:
+                    type: array
+                    items:
+                      type: string
+              destinationField:
+                $ref: '#/components/schemas/Properties_Property'
+              preview:
+                type: array
+                items:
+                  type: string
+        headerRowCount:
+          type: integer
+          description: The number of rows to skip before reading data from the document
+          example: 1
+    JobPlan:
+      title: Job execution plan
+      description: The job/plan tuple that contains the full plan and the jobs status
+      type: object
+      required:
+        - jobId
+      properties:
+        job:
+          $ref: '#/components/schemas/Job'
+        plan:
+          $ref: '#/components/schemas/Plan'
+    JobStats:
+      title: JobStats
+      description: Statistics about Flatfile jobs
+      type: object
+      properties:
+        start:
+          type: string
+          format: date-time
+          description: The time these statistics started
+        end:
+          type: string
+          format: date-time
+          description: The cutoff point for these statistics
+        jobs:
+          type: object
+          properties:
+            map:
+              type: object
+              properties:
+                created:
+                  type: integer
+                  description: The total number of map jobs created
+                completed:
+                  type: integer
+                  description: The number of jobs completed
+                automated:
+                  type: integer
+                  description: The number of jobs completed without user input
+                failed:
+                  type: integer
+                  description: The number of failed map jobs
+        accounts:
+          type: object
+          properties:
+            leastAbandonedJobs:
+              type: array
+              items:
+                $ref: '#/components/schemas/AccountId'
+              description: The top performing accounts for this time period
+            mostAbandonedJobs:
+              type: array
+              items:
+                $ref: '#/components/schemas/AccountId'
+              description: The accounts with the most trouble for this time period
+    AgentStats:
+      title: AgentStats
+      description: Statistics about Flatfile agents
+      type: object
+      properties:
+        start:
+          type: string
+          format: date-time
+          description: The time these statistics started
+        end:
+          type: string
+          format: date-time
+          description: The cutoff point for these statistics
+        executions:
+          type: integer
+          description: The total number of agent executions for this time period
+        succeeded:
+          type: integer
+          description: The total number of successful agent executions for this time period
+        failed:
+          type: integer
+    Workbook:
+      title: Workbook
+      description: A collection of one or more sheets
+      type: object
+      required:
+        - id
+        - spaceId
+      properties:
+        id:
+          $ref: '#/components/schemas/WorkbookId'
+        name:
+          type: string
+        spaceId:
+          $ref: '#/components/schemas/SpaceId'
+        environmentId:
+          $ref: '#/components/schemas/EnvironmentId'
+        sheets:
+          type: array
+          items:
+            $ref: '#/components/schemas/Sheet'
+        config:
+          $ref: '#/components/schemas/WorkbookConfig'
+        labels:
+          type: array
+          items:
+            type: string
+    Sheet:
+      title: Sheet
+      description: A place to store tabular data
+      type: object
+      required:
+        - id
+        - name
+      properties:
+        id:
+          $ref: '#/components/schemas/SheetId'
+        name:
+          type: string
+        config:
+          $ref: '#/components/schemas/SheetConfig'
+    RecordsResponseData:
+      title: RecordsResponseData
+      description: A list of records with optional record counts
+      allOf:
+        - $ref: '#/components/schemas/Success'
+        - type: object
+          properties:
+            records:
+              $ref: '#/components/schemas/RecordsWithLinks'
+            counts:
+              $ref: '#/components/schemas/RecordCounts'
+            versionId:
+              $ref: '#/components/schemas/VersionId'
+    SortDirection:
+      type: string
+      enum:
+        - asc
+        - desc
+    Filter:
+      type: string
+      enum:
+        - valid
+        - error
+        - all
+        - none
+    WorkbookConfig:
+      title: Workbook Configuration
+      description: Properties used to create a new Workbook
+      type: object
+      required:
+        - name
+        - spaceId
+        - environmentId
+      properties:
+        name:
+          type: string
+        labels:
+          type: array
+          items:
+            type: string
+        spaceId:
+          $ref: '#/components/schemas/SpaceId'
+        environmentId:
+          $ref: '#/components/schemas/EnvironmentId'
+        sheets:
+          type: array
+          items:
+            $ref: '#/components/schemas/SheetConfig'
+          maxItems: 10
+        actions:
+          type: array
+          items:
+            $ref: '#/components/schemas/Properties_Action'
+    SheetConfig:
+      title: Sheet Configuration
+      description: Describes shape of data as well as behavior
+      type: object
+      required:
+        - name
+        - fields
+      properties:
+        name:
+          type: string
+        description:
+          type: string
+        slug:
+          type: string
+        fields:
+          type: array
+          items:
+            $ref: '#/components/schemas/Properties_Property'
+          minItems: 1
+          maxItems: 250
+        actions:
+          type: array
+          items:
+            $ref: '#/components/schemas/Properties_Action'
+    FieldConfig:
+      $ref: '#/components/schemas/Properties_Property'
+    RecordsWithLinks:
+      title: RecordsWithLinks
+      description: 'List of Record objects, including links to related rows'
+      type: array
+      items:
+        $ref: '#/components/schemas/RecordWithLinks'
+    RecordWithLinks:
+      title: RecordWithLinks
+      description: 'A single row of data in a Sheet, including links to related rows'
+      type: object
+      required:
+        - id
+        - workbookId
+        - sheetId
+        - values
+      properties:
+        id:
+          $ref: '#/components/schemas/RecordId'
+        workbookId:
+          $ref: '#/components/schemas/WorkbookId'
+        sheetId:
+          $ref: '#/components/schemas/SheetId'
+        values:
+          $ref: '#/components/schemas/RecordDataWithLinks'
+    RecordDataWithLinks:
+      title: RecordDataWithLinks
+      description: 'A single row of data in a Sheet, including links to related rows'
+      type: object
+      additionalProperties:
+        $ref: '#/components/schemas/CellValueWithLinks'
+    CellValueWithLinks:
+      title: CellValueWithLinks
+      type: object
+      allOf:
+        - $ref: '#/components/schemas/CellValue'
+      properties:
+        links:
+          $ref: '#/components/schemas/Records'
+    Record:
+      title: Record
+      description: A single row of data in a Sheet
+      type: object
+      required:
+        - id
+        - workbookId
+        - sheetId
+        - values
+      properties:
+        id:
+          $ref: '#/components/schemas/RecordId'
+        workbookId:
+          $ref: '#/components/schemas/WorkbookId'
+        sheetId:
+          $ref: '#/components/schemas/SheetId'
+        values:
+          $ref: '#/components/schemas/RecordData'
+    Records:
+      title: Records
+      description: List of Record objects
+      type: array
+      items:
+        $ref: '#/components/schemas/Record'
+    RecordCounts:
+      title: Record Counts
+      type: object
+      properties:
+        total:
+          type: number
+        valid:
+          type: number
+        error:
+          type: number
+    RecordsData:
+      title: RecordsData
+      description: Array of record data
+      type: array
+      items:
+        $ref: '#/components/schemas/RecordData'
+    RecordData:
+      title: RecordData
+      description: A single row of data in a Sheet
+      type: object
+      additionalProperties:
+        $ref: '#/components/schemas/CellValue'
+    CellValue:
+      title: CellValue
+      type: object
+      properties:
+        value:
+          nullable: true
+          anyOf:
+            - type: string
+              nullable: true
+            - type: number
+              nullable: true
+            - type: boolean
+              nullable: true
+          example: 100
+        valid:
+          type: boolean
+          example: true
+        messages:
+          type: array
+          items:
+            $ref: '#/components/schemas/ValidationMessage'
+    RecordsUpdates:
+      title: RecordsUpdates
+      description: Array of record updates
+      type: array
+      items:
+        $ref: '#/components/schemas/RecordUpdates'
+    RecordUpdates:
+      title: RecordUpdates
+      description: Record id and values to be updated
+      type: object
+      required:
+        - id
+        - values
+      properties:
+        id:
+          $ref: '#/components/schemas/RecordId'
+        versionId:
+          $ref: '#/components/schemas/VersionId'
+        values:
+          $ref: '#/components/schemas/RecordData'
+    FieldsData:
+      title: FieldsData
+      description: Array of field data
+      type: array
+      items:
+        $ref: '#/components/schemas/FieldData'
+    FieldData:
+      title: FieldData
+      description: A single field of data in a Sheet
+      type: object
+      allOf:
+        - type: object
+          properties:
+            id:
+              $ref: '#/components/schemas/RecordId'
+        - $ref: '#/components/schemas/CellValue'
+        - type: object
+          properties:
+            counts:
+              $ref: '#/components/schemas/RecordCounts'
+    FieldResponse:
+      title: FieldResponse
+      description: A field with one or many records
+      type: object
+      additionalProperties:
+        $ref: '#/components/schemas/FieldsData'
+    ValidationMessage:
+      title: Validation Message
+      description: Record data validation messages
+      type: object
+      properties:
+        type:
+          type: string
+          enum:
+            - error
+            - warn
+            - info
+          example:
+            - info
+        source:
+          type: string
+          enum:
+            - required-constraint
+            - unique-constraint
+            - custom-logic
+            - unlinked
+            - invalid-option
+          example:
+            - custom-logic
+        message:
+          type: string
+          example: Automatically cast to number
+    Properties_Action:
+      type: object
+      required:
+        - slug
+        - label
+      properties:
+        slug:
+          type: string
+        label:
+          type: string
+        type:
+          type: string
+        description:
+          type: string
+    Properties_ArrayableProperty:
+      type: object
+      properties:
+        is_array:
+          type: boolean
+          description: Will allow multiple values and store as an array
+          default: false
+    Properties_BaseConstraint:
+      type: object
+      required:
+        - type
+      properties:
+        type:
+          type: string
+          enum:
+            - required
+            - unique
+            - computed
+    Properties_BaseProperty:
+      type: object
+      required:
+        - key
+      properties:
+        key:
+          type: string
+          example: name
+          minLength: 1
+        type:
+          type: string
+          default: string
+          enum:
+            - string
+            - number
+            - boolean
+            - date
+            - enum
+            - reference
+        label:
+          type: string
+          example: Full Name
+          description: User friendly field name
+        description:
+          type: string
+          example: The full name of the customer
+        constraints:
+          type: array
+          items:
+            $ref: '#/components/schemas/Properties_Constraint'
+    Properties_BooleanProperty:
+      allOf:
+        - $ref: '#/components/schemas/Properties_BaseProperty'
+        - type: object
+          properties:
+            type:
+              type: string
+              default: string
+              enum:
+                - boolean
+            config:
+              type: object
+              properties:
+                allow_indeterminate:
+                  type: boolean
+                  default: true
+                  description: Allow a neither true or false state to be stored as `null`
+    Properties_ComputedConstraint:
+      allOf:
+        - $ref: '#/components/schemas/Properties_BaseConstraint'
+        - type: object
+          properties:
+            type:
+              enum:
+                - computed
+    Properties_Constraint:
+      oneOf:
+        - $ref: '#/components/schemas/Properties_RequiredConstraint'
+        - $ref: '#/components/schemas/Properties_UniqueConstraint'
+        - $ref: '#/components/schemas/Properties_ComputedConstraint'
+      discriminator:
+        propertyName: type
+        mapping:
+          required: '#/components/schemas/RequiredConstraint'
+          unique: '#/components/schemas/UniqueConstraint'
+          computed: '#/components/schemas/ComputedConstraint'
+    Properties_DateProperty:
+      allOf:
+        - $ref: '#/components/schemas/Properties_BaseProperty'
+        - type: object
+          properties:
+            type:
+              type: string
+              default: string
+              enum:
+                - date
+    Properties_EnumProperty:
+      allOf:
+        - $ref: '#/components/schemas/Properties_BaseProperty'
+        - $ref: '#/components/schemas/Properties_ArrayableProperty'
+        - type: object
+          required:
+            - config
+          properties:
+            type:
+              type: string
+              default: string
+              enum:
+                - enum
+            config:
+              type: object
+              required:
+                - options
+              properties:
+                allow_custom:
+                  type: boolean
+                  default: false
+                  description: Permit the user to create new options for this specific field.
+                options:
+                  type: array
+                  items:
+                    $ref: '#/components/schemas/Properties_EnumPropertyOption'
+    Properties_EnumPropertyOption:
+      type: object
+      required:
+        - value
+      properties:
+        value:
+          anyOf:
+            - type: string
+              minLength: 0
+            - type: integer
+              minimum: 0
+            - type: boolean
+          example: 80ce8718a21c
+          description: The value or ID of this option. This value will be sent in egress
+        label:
+          type: string
+          example: High Priority
+          description: 'A visual label for this option, defaults to value if not provided'
+        color:
+          type: string
+          description: An optional color to assign this option
+          example: '#f00000'
+        icon:
+          type: string
+          description: A reference pointer to a previously registered icon
+        meta:
+          type: object
+          description: An arbitrary JSON object to be associated with this option and made available to hooks
+    Properties_NumberProperty:
+      allOf:
+        - $ref: '#/components/schemas/Properties_BaseProperty'
+        - $ref: '#/components/schemas/Properties_ArrayableProperty'
+        - type: object
+          properties:
+            type:
+              type: string
+              default: string
+              enum:
+                - number
+            config:
+              type: object
+              description: Optional configuration
+              properties:
+                decimal_places:
+                  description: Number of decimal places to round data to
+                  type: integer
+                  example: 2
+                  default: 0
+                  minimum: 0
+                  maximum: 65
+    Properties_Property:
+      oneOf:
+        - $ref: '#/components/schemas/Properties_StringProperty'
+        - $ref: '#/components/schemas/Properties_NumberProperty'
+        - $ref: '#/components/schemas/Properties_BooleanProperty'
+        - $ref: '#/components/schemas/Properties_DateProperty'
+        - $ref: '#/components/schemas/Properties_EnumProperty'
+        - $ref: '#/components/schemas/Properties_ReferenceProperty'
+      discriminator:
+        propertyName: type
+        mapping:
+          string: '#/components/schemas/StringProperty'
+          number: '#/components/schemas/NumberProperty'
+          boolean: '#/components/schemas/BooleanProperty'
+          date: '#/components/schemas/DateProperty'
+          enum: '#/components/schemas/EnumProperty'
+          reference: '#/components/schemas/ReferenceProperty'
+    Properties_ReferenceProperty:
+      allOf:
+        - $ref: '#/components/schemas/Properties_BaseProperty'
+        - $ref: '#/components/schemas/Properties_ArrayableProperty'
+        - type: object
+          required:
+            - config
+          properties:
+            type:
+              type: string
+              default: string
+              enum:
+                - reference
+            config:
+              type: object
+              required:
+                - ref
+                - relationship
+              properties:
+                ref:
+                  type: string
+                  description: Full path reference to a sheet configuration. Must be in the same workbook.
+                  minLength: 1
+                key:
+                  type: string
+                  description: Key of the property to use as the reference key. Defaults to `id`
+                  default: id
+                relationship:
+                  type: string
+                  description: The type of relationship this defines
+                  enum:
+                    - has-one
+                    - has-many
+    Properties_RequiredConstraint:
+      allOf:
+        - $ref: '#/components/schemas/Properties_BaseConstraint'
+        - type: object
+          properties:
+            type:
+              enum:
+                - required
+    Properties_StringProperty:
+      allOf:
+        - $ref: '#/components/schemas/Properties_BaseProperty'
+        - type: object
+          properties:
+            type:
+              type: string
+              default: string
+              enum:
+                - string
+    Properties_UniqueConstraint:
+      allOf:
+        - $ref: '#/components/schemas/Properties_BaseConstraint'
+        - type: object
+          required:
+            - type
+          properties:
+            type:
+              enum:
+                - unique
+            config:
+              type: object
+              properties:
+                case_sensitive:
+                  type: boolean
+                  default: true
+                  description: Ignore casing when determining uniqueness
+                ignore_empty:
+                  type: boolean
+                  description: Do not flag empty values as duplicate

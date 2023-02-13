@@ -1,0 +1,372 @@
+# yaml-language-server: $schema=https://raw.githubusercontent.com/fern-api/fern/main/fern.schema.json
+
+imports:
+  commons: commons.yml
+  root: __package__.yml
+
+service:
+  auth: false
+  base-path: /workbooks
+  endpoints:
+    getAllWorkbooks:
+      path: ""
+      method: GET
+      docs: Returns all workbooks matching a filter for an account or space
+      display-name: List workbooks
+      request:
+        query-parameters:
+          spaceId: optional<string>
+      response: Workbooks
+
+    addWorkbook:
+      path: ""
+      method: POST
+      docs: Creates a workbook and adds it to a space
+      display-name: Create a workbook
+      request:
+        body: "#/components/requestBodies/WorkbookConfig"
+
+    getWorkbookById:
+      path: /{workbookId}
+      method: GET
+      docs: Returns a single workbook
+      display-name: Get a workbook
+      path-parameters:
+        workbookId:
+          docs: ID of workbook to return
+          type: string
+      response: commons.Workbook
+
+    deleteWorkbookById:
+      path: /{workbookId}
+      method: DELETE
+      docs: Delete a workbook
+      display-name: Delete a workbook
+      path-parameters:
+        workbookId:
+          docs: ID of workbook to delete
+          type: string
+      response: commons.Success
+
+    getSheets:
+      path: /{workbookId}/sheets
+      method: GET
+      docs: Returns sheets in a workbook
+      display-name: List sheets
+      path-parameters:
+        workbookId:
+          docs: ID of workbook
+          type: string
+      response: Sheets
+
+    getSheet:
+      path: /{workbookId}/sheets/{sheetId}
+      method: GET
+      docs: Returns a sheet in a workbook
+      display-name: Get a sheet
+      path-parameters:
+        workbookId:
+          docs: ID of workbook
+          type: string
+        sheetId:
+          docs: ID of sheet
+          type: string
+      response: Sheet
+
+    getRecords:
+      path: /{workbookId}/sheets/{sheetId}/records
+      method: GET
+      docs: Returns records from a sheet in a workbook
+      display-name: Get records
+      path-parameters:
+        workbookId:
+          docs: ID of workbook
+          type: string
+        sheetId:
+          docs: ID of sheet
+          type: string
+      request:
+        query-parameters:
+          versionId: optional<string>
+          sortField:
+            docs: Name of field by which to sort records
+            type: optional<string>
+          sortDirection:
+            docs: Sort direction - asc (ascending) or desc (descending)
+            type: optional<__package__.SortDirection>
+          filter:
+            docs: Options to filter records
+            type: optional<commons.Filter>
+          filterField:
+            docs: Name of field by which to filter records
+            type: optional<string>
+          pageSize:
+            docs: >-
+              Number of records to return in a page (default 1000 if pageNumber
+              included)
+            type: optional<integer>
+          pageNumber:
+            docs: Based on pageSize, which page of records to return
+            type: optional<integer>
+          includeCounts:
+            docs: >-
+              Include counts for the total records, valid records and records
+              with errors
+            type: optional<boolean>
+          searchValue:
+            docs: >-
+              Search the entire sheet for the given value, returning matching
+              rows
+            type: optional<string>
+      response: commons.RecordsResponse
+
+    updateRecords:
+      path: /{workbookId}/sheets/{sheetId}/records
+      method: PUT
+      docs: Updates existing records in a workbook sheet
+      display-name: Update records
+      path-parameters:
+        workbookId:
+          docs: ID of workbook
+          type: string
+        sheetId:
+          docs: ID of sheet
+          type: string
+      request:
+        body: "#/components/requestBodies/RecordsUpdates"
+      response: commons.RecordsResponse
+
+    addRecords:
+      path: /{workbookId}/sheets/{sheetId}/records
+      method: POST
+      docs: Adds records to a workbook sheet
+      display-name: Insert records
+      path-parameters:
+        workbookId:
+          docs: ID of workbook
+          type: string
+        sheetId:
+          docs: ID of sheet
+          type: string
+      request:
+        body: "#/components/requestBodies/RecordsData"
+
+    deleteRecords:
+      path: /{workbookId}/sheets/{sheetId}/records
+      method: DELETE
+      docs: Deletes records from a workbook sheet
+      display-name: Delete records
+      path-parameters:
+        workbookId:
+          docs: ID of workbook
+          type: string
+        sheetId:
+          docs: ID of sheet
+          type: string
+      response: commons.Success
+
+    getRecordsCsv:
+      path: /{workbookId}/sheets/{sheetId}/download
+      method: GET
+      docs: Returns records from a sheet in a workbook as a csv file
+      display-name: Download records as a CSV file
+      path-parameters:
+        workbookId:
+          docs: ID of workbook
+          type: string
+        sheetId:
+          docs: ID of sheet
+          type: string
+      request:
+        query-parameters:
+          versionId: optional<string>
+          sortField:
+            docs: Name of field by which to sort records
+            type: optional<string>
+          sortDirection:
+            docs: Sort direction - asc (ascending) or desc (descending)
+            type: optional<__package__.SortDirection>
+          filter:
+            docs: Options to filter records
+            type: optional<commons.Filter>
+          filterField:
+            docs: Name of field by which to filter records
+            type: optional<string>
+      response: DownloadCsv
+
+    getFields:
+      path: /{workbookId}/sheets/{sheetId}/fields
+      method: GET
+      docs: Returns fields from a sheet in a workbook
+      display-name: Get fields
+      path-parameters:
+        workbookId:
+          docs: ID of workbook
+          type: string
+        sheetId:
+          docs: ID of sheet
+          type: string
+      request:
+        query-parameters:
+          sortField:
+            docs: Name of field by which to sort records
+            type: optional<string>
+          sortDirection:
+            docs: Sort direction - asc (ascending) or desc (descending)
+            type: optional<__package__.SortDirection>
+          filter:
+            docs: Options to filter records
+            type: optional<commons.Filter>
+          filterField:
+            docs: Name of field by which to filter records
+            type: optional<string>
+          pageSize:
+            docs: >-
+              Number of records to return in a page (default 1000 if pageNumber
+              included)
+            type: optional<integer>
+          pageNumber:
+            docs: Based on pageSize, which page of records to return
+            type: optional<integer>
+          distinct:
+            docs: When true, excludes duplicate values
+            type: optional<boolean>
+      response: commons.Fields
+
+    getField:
+      path: /{workbookId}/sheets/{sheetId}/fields/{fieldId}
+      method: GET
+      docs: Returns a field from a sheet in a workbook
+      display-name: Get a field
+      path-parameters:
+        workbookId:
+          docs: ID of workbook
+          type: string
+        sheetId:
+          docs: ID of sheet
+          type: string
+        fieldId:
+          docs: ID of field
+          type: string
+      request:
+        query-parameters:
+          sortField:
+            docs: Name of field by which to sort records
+            type: optional<string>
+          sortDirection:
+            docs: Sort direction - asc (ascending) or desc (descending)
+            type: optional<__package__.SortDirection>
+          filter:
+            docs: Options to filter records
+            type: optional<commons.Filter>
+          pageSize:
+            docs: >-
+              Number of records to return in a page (default 1000 if pageNumber
+              included)
+            type: optional<integer>
+          pageNumber:
+            docs: Based on pageSize, which page of records to return
+            type: optional<integer>
+          distinct:
+            docs: When true, excludes duplicate values
+            type: optional<boolean>
+      response: commons.Fields
+
+    find:
+      path: /{workbookId}/sheets/{sheetId}/fields/{fieldId}/find/{searchValue}
+      method: GET
+      docs: >-
+        Searches for the given value in a field and returns the records that
+        match the search criteria
+      display-name: Find a value in a field
+      path-parameters:
+        workbookId:
+          docs: ID of workbook
+          type: string
+        sheetId:
+          docs: ID of sheet
+          type: string
+        fieldId:
+          docs: ID of field
+          type: string
+        searchValue:
+          docs: The value to search for
+          type: string
+      request:
+        query-parameters:
+          pageSize:
+            docs: >-
+              Number of records to return in a page (default 1000 if pageNumber
+              included)
+            type: optional<integer>
+          pageNumber:
+            docs: Based on pageSize, which page of records to return
+            type: optional<integer>
+      response: commons.RecordsResponse
+
+    replace:
+      path: /{workbookId}/sheets/{sheetId}/fields/{fieldId}/replace/{searchValue}
+      method: PUT
+      docs: >-
+        Searches for the given searchValue in a field and replaces all instances
+        of that value with replaceValue
+      display-name: Find and replace a value in a field
+      path-parameters:
+        workbookId:
+          docs: ID of workbook
+          type: string
+        sheetId:
+          docs: ID of sheet
+          type: string
+        fieldId:
+          docs: ID of field
+          type: string
+        searchValue:
+          docs: The value to search for
+          type: string
+      request:
+        query-parameters:
+          pageSize:
+            docs: >-
+              Number of records to return in a page (default 1000 if pageNumber
+              included)
+            type: optional<integer>
+          pageNumber:
+            docs: Based on pageSize, which page of records to return
+            type: optional<integer>
+        body: "#/components/requestBodies/RecordsReplace"
+      response: commons.RecordsResponse
+
+    createVersion:
+      path: /{workbookId}/sheets/{sheetId}/versions
+      method: POST
+      docs: Creates a new version of a workbook sheet
+      display-name: Create a version
+      path-parameters:
+        workbookId:
+          docs: ID of workbook
+          type: string
+        sheetId:
+          docs: ID of sheet
+          type: string
+
+types:
+  Workbooks:
+    properties:
+      data: optional<list<commons.Workbook>>
+
+  Sheets:
+    properties:
+      data: optional<list<commons.Sheet>>
+
+  Sheet:
+    properties:
+      data: optional<commons.Sheet>
+
+  Version:
+    properties:
+      data: optional<_InlinedType1>
+
+  _InlinedType1:
+    properties:
+      versionId: optional<commons.VersionId>

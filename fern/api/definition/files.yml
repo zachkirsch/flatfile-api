@@ -1,0 +1,71 @@
+# yaml-language-server: $schema=https://raw.githubusercontent.com/fern-api/fern/main/fern.schema.json
+
+imports:
+  commons: commons.yml
+
+service:
+  auth: false
+  base-path: /files
+  endpoints:
+    getFiles:
+      path: ""
+      method: GET
+      display-name: List files
+      request:
+        query-parameters:
+          spaceId: optional<string>
+      response: Files
+
+    createFile:
+      path: ""
+      method: POST
+      display-name: Upload a file
+      request:
+        body: "#/components/requestBodies/UploadFile"
+      response: commons.File
+
+    getFile:
+      path: /{fileId}
+      method: GET
+      display-name: Get a file
+      path-parameters:
+        fileId: string
+      response: commons.File
+
+    deleteFile:
+      path: /{fileId}
+      method: DELETE
+      display-name: Delete a file
+      path-parameters:
+        fileId: string
+      response: commons.Success
+
+    updateFileById:
+      path: /{fileId}
+      method: PATCH
+      docs: Update a file, to change the workbook id for example
+      display-name: Update a File
+      path-parameters:
+        fileId:
+          docs: ID of file to update
+          type: string
+      request:
+        body: "#/components/requestBodies/File"
+      response: commons.File
+
+    downloadFile:
+      path: /{fileId}/download
+      method: GET
+      display-name: Download a file
+      path-parameters:
+        fileId: string
+      response: DownloadFile
+
+types:
+  Files:
+    properties:
+      data: optional<list<commons.File>>
+
+  DownloadFile:
+    docs: A binary payload containing the file contents
+    type: string

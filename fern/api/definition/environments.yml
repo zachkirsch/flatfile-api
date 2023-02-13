@@ -1,0 +1,69 @@
+# yaml-language-server: $schema=https://raw.githubusercontent.com/fern-api/fern/main/fern.schema.json
+
+imports:
+  commons: commons.yml
+
+service:
+  auth: false
+  base-path: /environments
+  endpoints:
+    getEnvironments:
+      path: ""
+      method: GET
+      docs: Get all environments
+      display-name: List environments
+      response: Environments
+
+    createEnvironment:
+      path: ""
+      method: POST
+      docs: Create a new environment
+      display-name: Create an environment
+      request:
+        body: commons.#/components/requestBodies/Environment
+      response: commons.Environment
+
+    getEnvironmentById:
+      path: /{environmentId}
+      method: GET
+      docs: Returns a single environment
+      display-name: Get an environment
+      path-parameters:
+        environmentId:
+          docs: ID of the environment to return
+          type: string
+      response: commons.Environment
+
+    updateEnvironmentById:
+      path: /{environmentId}
+      method: PATCH
+      docs: Updates a single environment, to change the name for example
+      display-name: Update an environment
+      path-parameters:
+        environmentId:
+          docs: ID of the environment to update
+          type: string
+      request:
+        body: commons.#/components/requestBodies/Environment
+      response: commons.Environment
+
+    getAllAgentLogs:
+      path: /{environmentId}/logs
+      method: GET
+      display-name: Get all agent logs for an environment
+      path-parameters:
+        environmentId: string
+      request:
+        query-parameters:
+          pageSize:
+            docs: Number of logs to return in a page (default 20)
+            type: optional<integer>
+          pageNumber:
+            docs: Based on pageSize, which page of records to return
+            type: optional<integer>
+      response: commons.AgentLogs
+
+types:
+  Environments:
+    properties:
+      data: optional<list<commons.Environment>>

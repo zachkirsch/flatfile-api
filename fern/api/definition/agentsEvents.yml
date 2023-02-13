@@ -1,0 +1,514 @@
+# yaml-language-server: $schema=https://raw.githubusercontent.com/fern-api/fern/main/fern.schema.json
+
+imports:
+  commons: commons.yml
+
+service:
+  auth: false
+  base-path: /environments/{environmentId}
+  path-parameters:
+    environmentId: string
+  endpoints:
+    getAgents:
+      path: /agents
+      method: GET
+      display-name: List agents
+      response: Agents
+
+    createAgent:
+      path: /agents
+      method: POST
+      display-name: Create an agent
+      request:
+        body: "#/components/requestBodies/Agent"
+      response: commons.Agent
+
+    getAgent:
+      path: /agents/{agentId}
+      method: GET
+      display-name: Get an agent
+      path-parameters:
+        agentId: string
+      response: commons.Agent
+
+    getAgentLogs:
+      path: /agents/{agentId}/logs
+      method: GET
+      display-name: Get logs for an agent
+      path-parameters:
+        agentId: string
+      response: commons.AgentLogs
+
+    getEvents:
+      path: /events
+      method: GET
+      docs: |-
+        ---
+        stoplight-id: 434d918eccd85
+        ---
+        ## Event Lifecycle
+        Listed here are all the event topics that the Flatfile Platform emits.
+        <table width="100%>
+        <thead>
+        <tr>
+          <th width="40%">Topic</th>
+          <th>Data</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr>
+          <td colspan="2">
+            <h4>Space Events Lifecycle</h4>
+            <code>space:added</code> -->️ <code>space:removed</code>
+          </td>
+        </tr>
+        <tr>
+          <td><code>space:added</code><br/>Emitted after a space has been successfully added.</td>
+          <td>
+          ```json
+          {
+            "context": {
+              "accountId": "us_acc_uj6s91wc",
+              "environmentId": "us_env_hVXkXs0b",
+              "spaceId": "us_sp_DrdXetPN",
+              "workbookId": "us_wb_qGZbKwDW",
+            },
+            "payload": {},
+          }
+          ```
+          </td>
+        </tr>
+        <tr>
+          <td><code>space:removed</code><br/>Emitted after a space has been successfully removed.</td>
+          <td>
+          ```json
+          {
+            "context": {
+              "accountId": "us_acc_uj6s91wc",
+              "environmentId": "us_env_hVXkXs0b",
+              "spaceId": "us_sp_DrdXetPN",
+              "workbookId": "us_wb_qGZbKwDW",
+            },
+            "payload": {},
+          }
+          ```
+          </td>
+        </tr>
+        <tr>
+          <td colspan="2">
+            <h4>Workbook Events Lifecycle</h4>
+            <code>workbook:added</code> -->️ <code>workbook:removed</code>
+          </td>
+        </tr>
+        <tr>
+          <td><code>workbook:added</code><br/>Emitted after a workbook has been successfully added.</td>
+          <td>
+          ```json
+          {
+            "context": {
+              "accountId": "us_acc_uj6s91wc",
+              "environmentId": "us_env_hVXkXs0b",
+              "spaceId": "us_sp_DrdXetPN",
+              "workbookId": "us_wb_qGZbKwDW",
+            },
+            "payload": {},
+          }
+          ```
+          </td>
+        </tr>
+        <tr>
+          <td><code>workbook:removed</code><br/>Emitted after a workbook has been successfully removed.</td>
+          <td>
+          ```json
+          {
+            "context": {
+              "accountId": "us_acc_uj6s91wc",
+              "environmentId": "us_env_hVXkXs0b",
+              "spaceId": "us_sp_DrdXetPN",
+              "workbookId": "us_wb_qGZbKwDW",
+            },
+            "payload": {},
+          }
+          ```
+          </td>
+        </tr>
+        <tr>
+          <td colspan="2">
+            <h4>User Events Lifecycle</h4>
+            <code>user:added</code> -->️ <code>user:online</code> <--> <code>user:offline</code> --> <code>user:removed</code>
+          </td>
+        </tr>
+        <tr>
+          <td>❌ <code>user:added</code><br/>Emitted after a user has been successfully added.</td>
+          <td>
+          ```json
+          {
+            // this event has not been set up
+          }
+          ```
+          </td>
+        </tr>
+        <tr>
+          <td>❌ <code>user:removed</code><br/>Emitted after a user has been successfully removed.</td>
+          <td>
+          ```json
+          {
+            // this event has not been set up
+          }
+          ```
+          </td>
+        </tr>
+        <tr>
+          <td>❌ <code>user:online</code><br/>Emitted when a user is logged in and using a workbook.</td>
+          <td>
+          ```json
+          {
+            // this event has not been set up
+          }
+          ```
+          </td>
+        </tr>
+        <tr>
+          <td>❌ <code>user:offline</code><br/>Emitted after a user logs out or becomes inactive.</td>
+          <td>
+          ```json
+          {
+            // this event has not been set up
+          }
+          ```
+          </td>
+        </tr>
+        <tr>
+          <td colspan="2">
+            <h4>Upload Events Lifecycle</h4>
+            <code>upload:started</code> --> (<code>upload:failed</code> OR <code>upload:completed</code>)
+          </td>
+        </tr>
+        <tr>
+          <td><code>upload:started</code><br/>Emitted immediately after a file upload begins. The file could still fail or succeed.</td>
+          <td>
+          ```json
+          {
+            "context": {
+              "accountId": "us_acc_uj6s91wc",
+              "environmentId": "us_env_hVXkXs0b",
+              "spaceId": "us_sp_DrdXetPN",
+            },
+            "payload": {},
+          }
+          ```
+          </td>
+        </tr>
+        <tr>
+          <td><code>upload:failed</code><br/>Emitted when a file upload fails.</td>
+          <td>
+          ```json
+          {
+            "context": {
+              "accountId": "us_acc_uj6s91wc",
+              "environmentId": "us_env_hVXkXs0b",
+              "spaceId": "us_sp_DrdXetPN",
+            },
+            "payload": {},
+          }
+          ```
+          </td>
+        </tr>
+        <tr>
+          <td><code>upload:completed</code><br/>Emitted after a file upload succeeds.</td>
+          <td>
+          ```json
+          {
+            "context": {
+              "accountId": "us_acc_uj6s91wc",
+              "environmentId": "us_env_hVXkXs0b",
+              "spaceId": "us_sp_DrdXetPN",
+              "fileId": "us_fl_qGZbKwDW",
+            },
+            "payload": {},
+          }
+          ```
+          </td>
+        </tr>
+        <tr>
+          <td colspan="2">
+            <h4>Job Events Lifecycle</h4>
+            <code>job:waiting</code> --> <code>job:started</code> -->️ <code>job:updated</code>🔁 --> (<code>job:failed</code> OR <code>job:completed</code>)
+          </td>
+        </tr>
+        <tr>
+          <td><code>job:started</code><br/>Emitted immediately before a job begins execution.</td>
+          <td>
+          ```json
+          {
+            "context": {
+              "accountId": "us_acc_uj6s91wc",
+              "environmentId": "us_env_hVXkXs0b",
+              "spaceId": "us_sp_DrdXetPN",
+              "workbookId": "us_wb_qGZbKwDW",
+              "fileId": "us_fl_qGZbKwDW" || undefined,
+              "jobId": "us_jb_UQg89Drd",
+            },
+            "payload": {
+              "type": "FILE" || "PIPELINE",
+              "operation": "EXTRACT" || "MAP",
+            },
+            "attributes": {
+              "progress": {
+                "current": 0,
+                "total": 5,
+                "percent": 0
+              }
+            },
+          }
+          ```
+          </td>
+        </tr>
+        <tr>
+          <td><code>job:waiting</code><br/>Emitted after a job has been successfully created and is ready for execution.</td>
+          <td>
+          ```json
+          {
+            "context": {
+              "accountId": "us_acc_uj6s91wc",
+              "environmentId": "us_env_hVXkXs0b",
+              "spaceId": "us_sp_DrdXetPN",
+              "workbookId": "us_wb_qGZbKwDW",
+              "fileId": "us_fl_qGZbKwDW" || undefined,
+              "jobId": "us_jb_UQg89Drd",
+            },
+            "payload": {},
+          }
+          ```
+          </td>
+        </tr>
+        <tr>
+          <td><code>job:updated</code><br/>Emitted when a jobs progress has been updated.</td>
+          <td>
+          ```json
+          {
+            "context": {
+              "accountId": "us_acc_uj6s91wc",
+              "environmentId": "us_env_hVXkXs0b",
+              "spaceId": "us_sp_DrdXetPN",
+              "workbookId": "us_wb_qGZbKwDW",
+              "sheetId": "us_sh_fHfzjzHb",
+              "fileId": "us_fl_qGZbKwDW" || undefined,
+              "jobId": "us_jb_UQg89Drd",
+            },
+            "payload": {
+              "type": "FILE" || "PIPELINE",
+              "operation": "EXTRACT" || "MAP",
+            },
+            "attributes": {
+              "progress": {
+                "current": 3,
+                "total": 5,
+                "percent": 60
+              }
+            },
+          }
+          ```
+          </td>
+        </tr>
+        <tr>
+          <td><code>job:failed</code><br/>Emitted after a job fails.</td>
+          <td>
+          ```json
+          {
+            "context": {
+              "accountId": "us_acc_uj6s91wc",
+              "environmentId": "us_env_hVXkXs0b",
+              "spaceId": "us_sp_DrdXetPN",
+              "workbookId": "us_wb_qGZbKwDW",
+              "fileId": "us_fl_qGZbKwDW" || undefined,
+              "jobId": "us_jb_UQg89Drd",
+            },
+            "payload": {
+              "err": "Error executing job: us_jb_UQg89Drd",
+              "type": "FILE" || "PIPELINE",
+              "operation": "EXTRACT" || "MAP",
+            },
+            "attributes": {
+              "progress": {
+                "current": 3,
+                "total": 5,
+                "percent": 60
+              }
+            },
+          }
+          ```
+          </td>
+        </tr>
+        <tr>
+          <td><code>job:completed</code><br/>Emitted after a job successfully completes.</td>
+          <td>
+          ```json
+          {
+            "context": {
+              "accountId": "us_acc_uj6s91wc",
+              "environmentId": "us_env_hVXkXs0b",
+              "spaceId": "us_sp_DrdXetPN",
+              "workbookId": "us_wb_qGZbKwDW",
+              "sheetId": "us_sh_fHfzjzHb",
+              "fileId": "us_fl_qGZbKwDW" || undefined,
+              "jobId": "us_jb_UQg89Drd",
+            },
+            "payload": {
+              "type": "FILE" || "PIPELINE",
+              "operation": "EXTRACT" || "MAP",
+            },
+            "attributes": {
+              "progress": {
+                "current": 5,
+                "total": 5,
+                "percent": 100
+              }
+            },
+          }
+          ```
+          </td>
+        </tr>
+        <tr>
+          <td colspan="2">
+            <h4>Records Events Lifecycle</h4>
+            <code>records:created</code> -->️ (<code>records:updated</code>🔁 OR <code>records:deleted</code>)
+          </td>
+        </tr>
+        <tr>
+          <td><code>records:created</code><br/>Emitted after records have been successfully added to a sheet.</td>
+          <td>
+          ```json
+          {
+            "context": {
+              "accountId": "us_acc_uj6s91wc",
+              "environmentId": "us_env_hVXkXs0b",
+              "spaceId": "us_sp_DrdXetPN",
+              "workbookId": "us_wb_qGZbKwDW",
+              "sheetId": "us_sh_fHfzjzHb",
+              "sheetSlug": "test/mySheet",
+              "versionId": "us_vr_jte4tzVn",
+            },
+            "payload": {
+              "count": 100,
+            },
+            "dataUrl": "v1/workbooks/us_wb_qGZbKwDW/sheets/us_sh_fHfzjzHb/records?versionId=us_vr_jte4tzVn",
+          }
+          ```
+          </td>
+        </tr>
+        <tr>
+          <td><code>records:updated</code><br/>Emitted after records have been updated. This could be a manual update or an update via a Data Hook.</td>
+          <td>
+          ```json
+          {
+            "context": {
+              "accountId": "us_acc_uj6s91wc",
+              "environmentId": "us_env_hVXkXs0b",
+              "spaceId": "us_sp_DrdXetPN",
+              "workbookId": "us_wb_qGZbKwDW",
+              "sheetId": "us_sh_fHfzjzHb",
+              "sheetSlug": "test/mySheet",
+              "versionId": "us_vr_jte4tzVn",
+            },
+            "payload": {
+              "count": 100,
+            } || {},
+            "dataUrl": "v1/workbooks/us_wb_qGZbKwDW/sheets/us_sh_fHfzjzHb/records?versionId=us_vr_jte4tzVn",
+          }
+          ```
+          </td>
+        </tr>
+        <tr>
+          <td>❌ <code>records:deleted</code><br/>Emitted after records have been deleted.</td>
+          <td>
+          ```json
+          {
+            // this event has not been set up
+          }
+          ```
+          </td>
+        </tr>
+        <tr>
+          <td colspan="2">
+            <h4>File Events Lifecycle</h4>
+            <code>file:deleted</code>
+          </td>
+        </tr>
+        <tr>
+          <td><code>file:deleted</code><br/>Emitted after a file has been deleted.</td>
+          <td>
+          ```json
+          {
+            "context": {
+              "accountId": "us_acc_uj6s91wc",
+              "environmentId": "us_env_hVXkXs0b",
+              "spaceId": "us_sp_DrdXetPN",
+              "fileId": "us_fl_qGZbKwDW",
+            },
+            "payload": {},
+          }
+          ```
+          </td>
+        </tr>
+        </tbody>
+        </table>
+      display-name: List events
+      request:
+        query-parameters:
+          spaceId: optional<string>
+          domain:
+            docs: Filter by event domain
+            type: optional<string>
+          topic:
+            docs: Filter by event topic
+            type: optional<string>
+          since:
+            docs: Filter by event timestamp
+            type: optional<string>
+          pageSize:
+            docs: Number of tokens to return in a page (default 10)
+            type: optional<integer>
+          pageNumber:
+            docs: Based on pageSize, which page of records to return
+            type: optional<integer>
+          includeAcknowledged:
+            docs: Include acknowledged events
+            type: optional<boolean>
+      response: Events
+
+    createEvent:
+      path: /events
+      method: POST
+      display-name: Create an event
+      request:
+        body: "#/components/requestBodies/Event"
+
+    getEvent:
+      path: /events/{eventId}
+      method: GET
+      display-name: Get an event
+      path-parameters:
+        eventId:
+          docs: The event id
+          type: string
+      response: commons.Event
+
+    ackEvent:
+      path: /events/{eventId}/ack
+      method: POST
+      display-name: Acknowledge an event
+      path-parameters:
+        eventId:
+          docs: The event id
+          type: string
+      response: commons.Success
+
+types:
+  Agents:
+    properties:
+      data: optional<list<commons.Agent>>
+
+  Events:
+    properties:
+      data: optional<list<commons.Event>>

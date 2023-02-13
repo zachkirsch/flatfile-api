@@ -1,6 +1,6 @@
 name: api
-auth: bearer
-environments:
-  Production: https://api.example.com
-  Sandbox: https://sandbox.example.com
+display-name: FlatFile API 
+auth: bearer 
+environments: 
+  Production: https://api.flatfile.com/v1
 default-environment: Production

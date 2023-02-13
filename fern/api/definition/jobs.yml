@@ -1,0 +1,98 @@
+# yaml-language-server: $schema=https://raw.githubusercontent.com/fern-api/fern/main/fern.schema.json
+
+imports:
+  commons: commons.yml
+
+service:
+  auth: false
+  base-path: /jobs
+  endpoints:
+    getJobs:
+      path: ""
+      method: GET
+      display-name: List jobs
+      request:
+        query-parameters:
+          environmentId: optional<string>
+          spaceId: optional<string>
+          workbookId: optional<string>
+          fileId: optional<string>
+      response: Jobs
+
+    createJob:
+      path: ""
+      method: POST
+      display-name: Create a job
+      request:
+        body: "#/components/requestBodies/Job"
+      response: commons.Job
+
+    getJob:
+      path: /{jobId}
+      method: GET
+      display-name: Get a job
+      path-parameters:
+        jobId: string
+      response: commons.Job
+
+    deleteJob:
+      path: /{jobId}
+      method: DELETE
+      display-name: Delete a job
+      path-parameters:
+        jobId: string
+      response: commons.Success
+
+    getJobExecutionPlan:
+      path: /{jobId}/plan
+      method: GET
+      docs: Returns a single job's execution plan
+      display-name: Get a job's execution plan
+      path-parameters:
+        jobId:
+          docs: ID of job to return
+          type: string
+      response: JobPlan
+
+    updateJobExecutionPlanById:
+      path: /{jobId}/plan
+      method: PUT
+      docs: Update a job's entire execution plan
+      display-name: Replace a job's plan
+      path-parameters:
+        jobId:
+          docs: ID of job to return
+          type: string
+      request:
+        body: commons.#/components/requestBodies/Plan
+
+    updateJobExecutionPlanFields:
+      path: /{jobId}/plan
+      method: PATCH
+      docs: Update a one or more individual fields on a job's execution plan
+      display-name: Update a job's plan
+      path-parameters:
+        jobId:
+          docs: ID of job to return
+          type: string
+      request:
+        body: commons.#/components/requestBodies/Plan
+
+    executeJob:
+      path: /{jobId}/execute
+      method: POST
+      docs: Execute a job and return the job
+      display-name: Execute a job
+      path-parameters:
+        jobId:
+          docs: ID of job to return
+          type: string
+
+types:
+  Jobs:
+    properties:
+      data: optional<list<commons.Job>>
+
+  JobPlan:
+    properties:
+      data: optional<commons.JobPlan>
