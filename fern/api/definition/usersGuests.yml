@@ -7,23 +7,24 @@ service:
   auth: false
   base-path: ""
   endpoints:
-    getUsers:
+    getAll:
       path: /users
       method: GET
       docs: Gets a list of users
       display-name: List users
       response: Users
 
-    createUser:
+    create:
       path: /users
       method: POST
       docs: A user is a privileged user that logs in with a username and password.
       display-name: Create a user
       request:
-        body: "#/components/requestBodies/User"
+        name: CreateUserRequest
+        body: UserRequest
       response: commons.User
 
-    getUser:
+    get:
       path: /users/{userId}
       method: GET
       docs: Gets a user
@@ -42,6 +43,7 @@ service:
       path-parameters:
         userId: string
       request:
+        name: GetApiTokensRequest
         query-parameters:
           tenantId: string
           pageSize:
@@ -60,6 +62,7 @@ service:
       path-parameters:
         userId: string
       request:
+        name: CreateApiTokenRequest
         query-parameters:
           tenantId: string
 
@@ -69,11 +72,12 @@ service:
       docs: Returns all guests
       display-name: List guests
       request:
+        name: GetGuestsRequest
         query-parameters:
           spaceId:
             docs: ID of space to return
-            type: string
-      response: commons.Guests
+            type: commons.SpaceId 
+      response: Guests
 
     addGuestToSpace:
       path: /guests
@@ -83,8 +87,9 @@ service:
         their tasks in a specific Space.
       display-name: Create a guest
       request:
-        body: "#/components/requestBodies/Guests"
-      response: commons.Guests
+        name: AddGuestToSpaceRequest
+        body: Guest
+      response: Guests
 
     getSpaceGuestById:
       path: /guests/{guestId}
@@ -95,7 +100,7 @@ service:
         guestId:
           docs: ID of guest to return
           type: string
-      response: commons.Guest
+      response: Guest
 
     deleteGuest:
       path: /guests/{guestId}
@@ -118,8 +123,9 @@ service:
           docs: ID of guest to return
           type: string
       request:
-        body: "#/components/requestBodies/Guest"
-      response: commons.Guest
+        name: UpdateGuestRequest
+        body: Guest          
+      response: Guest
 
     inviteGuests:
       path: /invitations
@@ -128,8 +134,7 @@ service:
         Guests can be created as a named guest on the Space or there’s a global
         link that will let anonymous guests into the space.
       display-name: Invite guests
-      request:
-        body: "#/components/requestBodies/Invite"
+      request: InviteGuestsRequest
       response: commons.Success
 
     exchangeInvitation:
@@ -137,23 +142,13 @@ service:
       method: POST
       docs: Exchange an invitation for an access token
       display-name: Exchange an invitation for an access token
-      request:
-        body: "#/components/requestBodies/Token"
+      request: ExchangeRequest
       response: Exchange
 
 types:
   Users:
     properties:
       data: optional<list<commons.User>>
-
-  ApiTokens:
-    properties:
-      pagination: optional<commons.Pagination>
-      data: optional<list<commons.ApiToken>>
-
-  ApiToken:
-    properties:
-      data: optional<commons.ApiToken>
 
   Exchange:
     properties:
@@ -172,3 +167,43 @@ types:
           The email address the recovery email was sent to, if the provided
           token was not valid
         type: optional<string>
+
+  UserRequest:
+    docs: Configurations for the user
+    properties:
+      email: string 
+      type: string 
+      accountId: commons.AccountId 
+  
+  Guest: 
+    docs: Configurations for the guests
+    properties:
+      environmentId: commons.EnvironmentId
+      email: string 
+      name: string 
+      spaces: list<commons.SpaceId>
+  
+  Guests: list<Guest>
+
+  ApiTokens: 
+    docs: List of api tokens without secrets
+    properties:
+      pagination: optional<commons.Pagination>
+      data: list<commons.ApiToken>
+
+  InviteGuestsRequest: list<Invite>
+
+  Invite: 
+    properties:
+      guestId: commons.GuestId 
+      spaceId: commons.SpaceId 
+      message: 
+        type: string
+        docs:  Message to send with the invite
+
+  ExchangeRequest: 
+    properties:
+      token: 
+        type: string 
+        docs: The token to use for the request
+      

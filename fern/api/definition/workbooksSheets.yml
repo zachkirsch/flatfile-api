@@ -2,18 +2,18 @@
 
 imports:
   commons: commons.yml
-  root: __package__.yml
 
 service:
   auth: false
   base-path: /workbooks
   endpoints:
-    getAllWorkbooks:
+    getAll:
       path: ""
       method: GET
       docs: Returns all workbooks matching a filter for an account or space
       display-name: List workbooks
       request:
+        name: GetAllWorkbooksRequest
         query-parameters:
           spaceId: optional<string>
       response: Workbooks
@@ -23,8 +23,7 @@ service:
       method: POST
       docs: Creates a workbook and adds it to a space
       display-name: Create a workbook
-      request:
-        body: "#/components/requestBodies/WorkbookConfig"
+      request: WorkbookConfig
 
     getWorkbookById:
       path: /{workbookId}
@@ -71,7 +70,7 @@ service:
         sheetId:
           docs: ID of sheet
           type: string
-      response: Sheet
+      response: SheetResponse
 
     getRecords:
       path: /{workbookId}/sheets/{sheetId}/records
@@ -86,6 +85,7 @@ service:
           docs: ID of sheet
           type: string
       request:
+        name: GetRecordsRequest
         query-parameters:
           versionId: optional<string>
           sortField:
@@ -93,7 +93,7 @@ service:
             type: optional<string>
           sortDirection:
             docs: Sort direction - asc (ascending) or desc (descending)
-            type: optional<__package__.SortDirection>
+            type: optional<commons.SortDirection>
           filter:
             docs: Options to filter records
             type: optional<commons.Filter>
@@ -132,8 +132,7 @@ service:
         sheetId:
           docs: ID of sheet
           type: string
-      request:
-        body: "#/components/requestBodies/RecordsUpdates"
+      request: RecordsUpdates
       response: commons.RecordsResponse
 
     addRecords:
@@ -148,8 +147,7 @@ service:
         sheetId:
           docs: ID of sheet
           type: string
-      request:
-        body: "#/components/requestBodies/RecordsData"
+      request: RecordsData
 
     deleteRecords:
       path: /{workbookId}/sheets/{sheetId}/records
@@ -178,6 +176,7 @@ service:
           docs: ID of sheet
           type: string
       request:
+        name: GetRecordsCsvRequest
         query-parameters:
           versionId: optional<string>
           sortField:
@@ -185,7 +184,7 @@ service:
             type: optional<string>
           sortDirection:
             docs: Sort direction - asc (ascending) or desc (descending)
-            type: optional<__package__.SortDirection>
+            type: optional<commons.SortDirection>
           filter:
             docs: Options to filter records
             type: optional<commons.Filter>
@@ -207,13 +206,14 @@ service:
           docs: ID of sheet
           type: string
       request:
+        name: GetFieldsRequest
         query-parameters:
           sortField:
             docs: Name of field by which to sort records
             type: optional<string>
           sortDirection:
             docs: Sort direction - asc (ascending) or desc (descending)
-            type: optional<__package__.SortDirection>
+            type: optional<commons.SortDirection>
           filter:
             docs: Options to filter records
             type: optional<commons.Filter>
@@ -249,13 +249,14 @@ service:
           docs: ID of field
           type: string
       request:
+        name: GetFieldRequest
         query-parameters:
           sortField:
             docs: Name of field by which to sort records
             type: optional<string>
           sortDirection:
             docs: Sort direction - asc (ascending) or desc (descending)
-            type: optional<__package__.SortDirection>
+            type: optional<commons.SortDirection>
           filter:
             docs: Options to filter records
             type: optional<commons.Filter>
@@ -293,6 +294,7 @@ service:
           docs: The value to search for
           type: string
       request:
+        name: FindValueRequest
         query-parameters:
           pageSize:
             docs: >-
@@ -325,6 +327,7 @@ service:
           docs: The value to search for
           type: string
       request:
+        name: ReplaceRecordsRequest
         query-parameters:
           pageSize:
             docs: >-
@@ -334,7 +337,11 @@ service:
           pageNumber:
             docs: Based on pageSize, which page of records to return
             type: optional<integer>
-        body: "#/components/requestBodies/RecordsReplace"
+        body:
+          properties:
+            replace:
+              type: unknown 
+              docs: The value to replace found values with 
       response: commons.RecordsResponse
 
     createVersion:
@@ -359,7 +366,7 @@ types:
     properties:
       data: optional<list<commons.Sheet>>
 
-  Sheet:
+  SheetResponse:
     properties:
       data: optional<commons.Sheet>
 
@@ -370,3 +377,36 @@ types:
   _InlinedType1:
     properties:
       versionId: optional<commons.VersionId>
+
+  WorkbookConfig:
+    docs: Properties used to create a new Workbook
+    properties:
+      name: string
+      labels: optional<list<string>>
+      spaceId: commons.SpaceId
+      environmentId: commons.EnvironmentId
+      sheets: optional<list<commons.SheetConfig>>
+      actions: optional<list<commons.Action>>
+
+  RecordsUpdates:
+    docs: Record data to insert in a sheet
+    properties:
+      items: list<RecordUpdates>
+
+  RecordUpdates: 
+    docs: Record id and values to be updated 
+    properties:
+      id: commons.RecordId 
+      versionId: optional<commons.VersionId>
+      value: commons.RecordData
+    
+  RecordsData: 
+    properties:
+      items: optional<list<commons.RecordData>>
+
+  DownloadCsv: 
+    properties:
+      schema:
+        type: unknown #Binary
+        docs: A binary payload containing the exported csv file 
+      

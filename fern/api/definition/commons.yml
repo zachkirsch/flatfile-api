@@ -51,30 +51,9 @@ types:
       createdAt: string
       secret: optional<string>
 
-  Guests:
-    properties:
-      data: optional<list<Guest>>
-
-  Guest:
-    properties:
-      data: optional<GuestConfig>
-
   GuestId:
     docs: Guest ID
     type: string
-
-  GuestConfig:
-    docs: Properties used to create a new guest
-    properties:
-      environmentId: EnvironmentId
-      email: string
-      name: string
-      spaces: list<Space>
-
-  Space:
-    properties:
-      id: SpaceId
-      lastAccessed: optional<string>
 
   EnvironmentId:
     docs: Environment ID
@@ -676,6 +655,11 @@ types:
     docs: Space Config ID
     type: string
 
+  Space:
+    properties:
+      id: SpaceId
+      lastAccessed: optional<string>
+
   SpacePatternConfig:
     docs: Properties used to create a new Space Config
     properties:
@@ -749,151 +733,134 @@ types:
       title:
         type: string 
         docs: Space the file should be uploaded to
-  
-  WorkbookConfig:
-    docs: Properties used to create a new Workbook
-    properties:
-      name: string
-      labels: optional<list<string>>
-      spaceId: SpaceId
-      environmentId: EnvironmentId
-      sheets: optional<list<SheetConfig>>
-      actions: optional<list<Action>>
 
   DocumentId:
     docs: Document ID
     type: string
 
-  Document:
+  Sheet:
+    docs: A place to store tabular data
     properties:
-      data: optional<DocumentConfig>
+      id: SheetId
+      name: string
+      config: optional<SheetConfig>
 
-  DocumentConfig:
-    docs: Properties used to create a new document
+  RecordsResponse:
     properties:
-      title: string
-      body: string
+      data: optional<RecordsResponseData>
 
-  # Sheet:
-  #   docs: A place to store tabular data
-  #   properties:
-  #     id: SheetId
-  #     name: string
-  #     config: optional<SheetConfig>
+  RecordsResponseData:
+    docs: A list of records with optional record counts
+    extends:
+      - Success
+    properties:
+      records: optional<RecordsWithLinks>
+      counts: optional<RecordCounts>
+      versionId: optional<VersionId>
 
-  # RecordsResponse:
-  #   properties:
-  #     data: optional<RecordsResponseData>
+  RecordsWithLinks:
+    docs: List of Record objects, including links to related rows
+    type: list<RecordWithLinks>
 
-  # RecordsResponseData:
-  #   docs: A list of records with optional record counts
-  #   extends:
-  #     - Success
-  #     - _InlinedType53
+  RecordWithLinks:
+    docs: A single row of data in a Sheet, including links to related rows
+    properties:
+      id: RecordId
+      workbookId: WorkbookId
+      sheetId: SheetId
+      values: RecordDataWithLinks
 
-  # _InlinedType53:
-  #   properties:
-  #     records: optional<RecordsWithLinks>
-  #     counts: optional<RecordCounts>
-  #     versionId: optional<VersionId>
+  RecordDataWithLinks:
+    docs: A single row of data in a Sheet, including links to related rows
+    type: map<string, CellValueWithLinks>
 
-  # RecordsWithLinks:
-  #   docs: List of Record objects, including links to related rows
-  #   type: list<RecordWithLinks>
+  CellValueWithLinks:
+    extends:
+      - CellValue
+    properties:
+      links: optional<Records>
 
-  # RecordWithLinks:
-  #   docs: A single row of data in a Sheet, including links to related rows
-  #   properties:
-  #     id: RecordId
-  #     workbookId: WorkbookId
-  #     sheetId: SheetId
-  #     values: RecordDataWithLinks
+  Records:
+    docs: List of Record objects
+    type: list<Record>
 
-  # RecordDataWithLinks:
-  #   docs: A single row of data in a Sheet, including links to related rows
-  #   type: map<string, CellValueWithLinks>
+  Record:
+    docs: A single row of data in a Sheet
+    properties:
+      id: RecordId
+      workbookId: WorkbookId
+      sheetId: SheetId
+      values: RecordData
 
-  # CellValueWithLinks:
-  #   extends:
-  #     - CellValue
-  #   properties:
-  #     links: optional<Records>
+  RecordData:
+    docs: A single row of data in a Sheet
+    type: map<string, CellValue>
 
-  # Records:
-  #   docs: List of Record objects
-  #   type: list<Record>
+  CellValue:
+    properties:
+      valid: optional<boolean>
+      messages: optional<list<ValidationMessage>>
 
-  # Record:
-  #   docs: A single row of data in a Sheet
-  #   properties:
-  #     id: RecordId
-  #     workbookId: WorkbookId
-  #     sheetId: SheetId
-  #     values: RecordData
+  ValidationMessage:
+    docs: Record data validation messages
+    properties:
+      type: optional<ValidationType>
+      source: optional<ValidationSource>
+      message: optional<string>
 
-  # RecordData:
-  #   docs: A single row of data in a Sheet
-  #   type: map<string, CellValue>
+  ValidationType:
+    enum:
+      - error
+      - warn
+      - info
 
-  # CellValue:
-  #   properties:
-  #     valid: optional<boolean>
-  #     messages: optional<list<ValidationMessage>>
+  ValidationSource:
+    enum:
+      - value: required-constraint
+        name: required_constraint
+      - value: unique-constraint
+        name: unique_constraint
+      - value: custom-logic
+        name: custom_logic
+      - unlinked
+      - value: invalid-option
+        name: invalid_option
 
-  # ValidationMessage:
-  #   docs: Record data validation messages
-  #   properties:
-  #     type: optional<_InlinedType54>
-  #     source: optional<_InlinedType55>
-  #     message: optional<string>
+  RecordCounts:
+    properties:
+      total: optional<double>
+      valid: optional<double>
+      error: optional<double>
 
-  # _InlinedType54:
-  #   enum:
-  #     - error
-  #     - warn
-  #     - info
+  Fields:
+    properties:
+      data: optional<FieldResponse>
 
-  # _InlinedType55:
-  #   enum:
-  #     - value: required-constraint
-  #       name: required_constraint
-  #     - value: unique-constraint
-  #       name: unique_constraint
-  #     - value: custom-logic
-  #       name: custom_logic
-  #     - unlinked
-  #     - value: invalid-option
-  #       name: invalid_option
+  FieldResponse:
+    docs: A field with one or many records
+    type: map<string, FieldsData>
 
-  # RecordCounts:
-  #   properties:
-  #     total: optional<double>
-  #     valid: optional<double>
-  #     error: optional<double>
+  FieldsData:
+    docs: Array of field data
+    type: list<FieldData>
 
-  # Fields:
-  #   properties:
-  #     data: optional<FieldResponse>
+  FieldData:
+    docs: A single field of data in a Sheet
+    properties:
+      id: optional<RecordId>
+      counts: optional<RecordCounts>
+    extends: CellValue
 
-  # FieldResponse:
-  #   docs: A field with one or many records
-  #   type: map<string, FieldsData>
+  SortDirection: 
+    enum: 
+      - asc 
+      - desc
 
-  # FieldsData:
-  #   docs: Array of field data
-  #   type: list<FieldData>
-
-  # FieldData:
-  #   docs: A single field of data in a Sheet
-  #   extends:
-  #     - _InlinedType56
-  #     - CellValue
-  #     - _InlinedType57
-
-  # _InlinedType56:
-  #   properties:
-  #     id: optional<RecordId>
-
-  # _InlinedType57:
-  #   properties:
-  #     counts: optional<RecordCounts>
+  Workbook: 
+    docs: A collection of one or more sheets 
+    properties:
+      id: WorkbookId
+      name: optional<string>
+      spaceId: SpaceId 
+      environmentId: optional<EnvironmentId>
+    

@@ -2,7 +2,6 @@
 
 imports:
   commons: commons.yml
-  root: __package__.yml
 
 service:
   auth: false
@@ -14,6 +13,7 @@ service:
       docs: Returns all space configs for an account
       display-name: List space configs
       request:
+        name: GetAllSpaceConfigsRequest
         query-parameters:
           environmentId: optional<string>
       response: SpacePatterns
@@ -26,9 +26,10 @@ service:
         using the config
       display-name: Replace a space config
       request:
+        name: ReplaceSpaceConfigRequest
         query-parameters:
           migrate: optional<boolean>
-        body: commons.#/components/requestBodies/SpacePattern
+        body: commons.SpacePatternConfig
 
     addSpaceConfig:
       path: /configs
@@ -36,7 +37,8 @@ service:
       docs: Creates a new Space Config
       display-name: Create a space config
       request:
-        body: commons.#/components/requestBodies/SpacePattern
+        name: AddSpaceConfigRequest
+        body: commons.SpacePattern
 
     getAllSpaces:
       path: ""
@@ -44,6 +46,7 @@ service:
       docs: Returns all spaces for an account or environment
       display-name: List spaces
       request:
+        name: GetAllSpacesRequest
         query-parameters:
           environmentId: optional<string>
           pageSize:
@@ -53,8 +56,8 @@ service:
             docs: Based on pageSize, which page of records to return
             type: optional<integer>
           search: optional<string>
-          sortField: optional<__package__.GetSpacesSortField>
-          sortDirection: optional<__package__.SortDirection>
+          sortField: optional<GetSpacesSortField>
+          sortDirection: optional<commons.SortDirection>
       response: Spaces
 
     addSpace:
@@ -63,7 +66,7 @@ service:
       docs: Creates a new space based on an existing Space Config
       display-name: Create a space
       request:
-        body: commons.#/components/requestBodies/Space
+        body: SpaceRequest
       response: commons.Space
 
     getSpaceById:
@@ -98,7 +101,8 @@ service:
           docs: ID of space to update
           type: string
       request:
-        body: commons.#/components/requestBodies/Space
+        name: UpdateSpaceRequest
+        body: SpaceRequest
       response: commons.Space
 
     getSpaceDocuments:
@@ -122,8 +126,8 @@ service:
           docs: ID of space to add the document on
           type: string
       request:
-        body: commons.#/components/requestBodies/Document
-      response: commons.Document
+        body: DocumentRequest
+      response: DocumentResponse
 
     getSpaceDocumentById:
       path: /{spaceId}/documents/{documentId}
@@ -137,7 +141,7 @@ service:
         documentId:
           docs: ID of document to return
           type: string
-      response: commons.Document
+      response: Document
 
     updateDocument:
       path: /{spaceId}/documents/{documentId}
@@ -152,8 +156,8 @@ service:
           docs: ID of document to return
           type: string
       request:
-        body: commons.#/components/requestBodies/Document
-      response: commons.Document
+        body: DocumentRequest
+      response: DocumentResponse
 
     getEventToken:
       path: /{spaceId}/subscription
@@ -178,7 +182,18 @@ types:
 
   Documents:
     properties:
-      data: optional<list<commons.Document>>
+      data: optional<list<DocumentResponse>>
+
+  DocumentResponse: 
+    properties:
+      data: Document
+
+  Document: 
+    docs: A document (markdown components) belong to a space
+    extends: DocumentConfig 
+    properties:
+      id: commons.DocumentId 
+      spaceId: commons.SpaceId 
 
   EventToken:
     docs: Properties used to allow users to connect to the event bus
@@ -191,3 +206,29 @@ types:
         docs: Time to live in minutes
         type: optional<double>
       token: optional<string>
+
+  GetSpacesSortField:
+    enum:
+      - name
+      - workbooksCount
+      - filesCount
+      - environmentId
+      - createdByUserName
+
+  DocumentRequest:
+    properties:
+      title: string
+      body: string
+
+  SpaceRequest: 
+    docs: Request body object used to create a space
+    properties:
+      spaceConfigId: commons.SpaceConfigId 
+      environmentId: commons.EnvironmentId 
+      primaryWorkbookId: commons.WorkbookId
+
+  DocumentConfig:
+    docs: Properties used to create a new document
+    properties:
+      title: string
+      body: string
