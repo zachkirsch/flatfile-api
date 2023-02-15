@@ -1,0 +1,121 @@
+types:
+  Property:
+    union:
+      string: StringProperty
+      number: NumberProperty
+      boolean: BooleanProperty
+      date: DateProperty
+      enum: EnumProperty
+      reference: ReferenceProperty
+  
+  BaseProperty:
+    properties:
+      key: string
+      label:
+        type: optional<string>
+        docs: User friendly field name
+      description: optional<string>
+      constraints: list<Constraint>
+  
+  ArrayableProperty:
+    properties:
+      is_array:
+        docs: Will allow multiple values and store as an array
+        type: optional<boolean>
+  
+  StringProperty:
+    extends:
+      - BaseProperty
+
+  NumberProperty:
+    extends:
+      - BaseProperty
+      - ArrayableProperty
+    properties:
+      config:
+        docs: Optional configuration
+        type: optional<NumberConfig>
+
+  NumberConfig:
+    docs: Optional configuration
+    properties:
+      decimal_places:
+        docs: Number of decimal places to round data to
+        type: integer
+  
+  BooleanProperty:
+    extends: BaseProperty
+    properties:
+      config: optional<BooleanPropertyConfig>
+
+  BooleanPropertyConfig:
+    properties:
+      allow_indeterminate:
+        type: boolean
+        docs: Allow a neither true or false state to be stored as `null`
+
+  DateProperty:
+    extends:
+      - BaseProperty
+
+  EnumProperty:
+    extends:
+      - BaseProperty
+      - ArrayableProperty
+    properties:
+      config: EnumPropertyConfig
+
+  EnumPropertyConfig:
+    properties:
+      allow_custom:
+        type: boolean
+        docs: Permit the user to create new options for this specific field.
+      options: list<EnumPropertyOption>
+
+  EnumPropertyOption:
+    properties:
+      label:
+        docs: A visual label for this option, defaults to value if not provided
+        type: optional<string>
+      color:
+        docs: An optional color to assign this option
+        type: optional<string>
+      icon:
+        docs: A reference pointer to a previously registered icon
+        type: optional<string>
+      meta:
+        docs: >-
+          An arbitrary JSON object to be associated with this option and made
+          available to hooks
+        type: optional<map<string, unknown>>
+      value: 
+        docs: >- 
+          The value or ID of this option. This value will be sent in egress. 
+          The type is a string | integer | boolean. 
+        type: unknown
+
+  ReferenceProperty:
+    extends:
+      - BaseProperty
+      - ArrayableProperty
+    properties:
+      config: ReferencePropertyConfig
+
+  ReferencePropertyConfig:
+    properties:
+      ref:
+        type: string
+        docs: Full path reference to a sheet configuration. Must be in the same workbook.
+      key:
+        type: string
+        docs: Key of the property to use as the reference key. Defaults to `id`
+      relationship:
+        type: ReferencePropertyRelationship
+        docs: The type of relationship this defines
+
+  ReferencePropertyRelationship:
+    enum:
+      - value: has-one
+        name: has_one
+      - value: has-many
+        name: has_many

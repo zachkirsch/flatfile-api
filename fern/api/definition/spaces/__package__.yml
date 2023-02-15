@@ -1,0 +1,152 @@
+# yaml-language-server: $schema=https://raw.githubusercontent.com/fern-api/fern/main/fern.schema.json
+
+imports:
+  commons: ../commons.yml
+
+service:
+  auth: false
+  base-path: /spaces
+  endpoints:
+    list:
+      path: ""
+      method: GET
+      docs: Returns all spaces for an account or environment
+      display-name: List spaces
+      request:
+        name: ListSpacesRequest
+        query-parameters:
+          environmentId: optional<string>
+          pageSize:
+            docs: Number of spaces to return in a page (default 10)
+            type: optional<integer>
+          pageNumber:
+            docs: Based on pageSize, which page of records to return
+            type: optional<integer>
+          search: optional<string>
+          sortField: optional<GetSpacesSortField>
+          sortDirection: optional<commons.SortDirection>
+      response: ListSpacesResponse
+      errors: 
+        - commons.BadRequest
+
+    create:
+      path: ""
+      method: POST
+      docs: Creates a new space based on an existing Space Config
+      display-name: Create a space
+      request:
+        body: SpaceRequest
+      response: SpaceResponse
+
+    get:
+      path: /{spaceId}
+      method: GET
+      docs: Returns a single space
+      display-name: Get a space
+      path-parameters:
+        spaceId:
+          docs: ID of space to return
+          type: commons.SpaceId
+      response: SpaceResponse
+
+    delete:
+      path: /{spaceId}
+      method: DELETE
+      docs: Delete a space
+      display-name: Delete a space
+      path-parameters:
+        spaceId:
+          docs: ID of space to delete
+          type: commons.SpaceId
+      response: commons.Success
+
+    update:
+      path: /{spaceId}
+      method: PATCH
+      docs: Update a space, to change the name for example
+      display-name: Update a space
+      path-parameters:
+        spaceId:
+          docs: ID of space to update
+          type: commons.SpaceId
+      request:
+        name: UpdateSpaceRequest
+        body: SpaceRequest
+      response: SpaceResponse
+
+    getEventToken:
+      path: /{spaceId}/subscription
+      method: GET
+      docs: Get a token which can be used to subscribe to events for this space
+      display-name: Get subscription credentials
+      path-parameters:
+        spaceId:
+          docs: ID of space to return
+          type: commons.SpaceId
+      response: EventToken
+
+types:
+  ListSpacesResponse: 
+    properties: 
+      pagination: optional<commons.Pagination>
+      data: optional<list<Space>>
+  
+  SpaceResponse: 
+    properties: 
+      data: optional<Space>
+  
+  Space: 
+    docs: A place to store your workbooks
+    extends: SpaceConfig
+    properties: 
+      id: commons.SpaceId
+      workbookCount: 
+        type: optional<integer>
+        docs: Amount of workbooks in the space
+      filesCount: 
+        type: optional<integer>
+        docs: Amount of files in the space
+      createdByUserId: optional<commons.UserId>
+      createdByUserName: 
+        type: optional<string>
+        docs: User name who created space
+      guestLink: 
+        type: optional<string>
+        docs: Guest link to the space
+  
+  SpaceConfig:
+    docs: Properties used to create a new Space
+    properties:
+      spaceConfigId: commons.SpaceConfigId
+      environmentId: commons.EnvironmentId
+      primaryWorkbookId: optional<commons.WorkbookId>
+      name:
+        docs: The name of the space
+        type: optional<string>
+      displayOrder:
+        docs: The display order
+        type: optional<integer>
+      metadata:
+        docs: Metadata for the space
+        type: unknown
+      actions: optional<list<commons.Action>>
+
+  EventToken:
+    docs: Properties used to allow users to connect to the event bus
+    properties:
+      accountId: optional<commons.AccountId>
+      subscribeKey:
+        docs: The id of the event bus to subscribe to
+        type: optional<string>
+      ttl:
+        docs: Time to live in minutes
+        type: optional<double>
+      token: optional<string>
+
+  GetSpacesSortField:
+    enum:
+      - name
+      - workbooksCount
+      - filesCount
+      - environmentId
+      - createdByUserName
