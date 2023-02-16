@@ -2,7 +2,7 @@ groups:
   publish:
     generators:
       - name: fernapi/fern-typescript-sdk
-        version: 0.1.2
+        version: 0.1.2-6-g698c409a
         output:
           location: npm
           package-name: '@fern-api/flatfile'
