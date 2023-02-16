@@ -46,6 +46,12 @@ service:
       errors: 
         - commons.BadRequestError
         - commons.NotFoundError
+      examples:
+        - name: Example0 
+          path-parameters:
+            agentId: $commons.AgentId
+          response: 
+            body: $GetAgentLogsResponse.Example0
 
 types:
   ListAgentsResponse:
@@ -68,16 +74,31 @@ types:
       source:
         docs: The source of the agent
         type: optional<string>
+    examples: 
+      - name: Example0 
+        value: 
+          topics: 
+            - $events.EventTopic.Example0
+          compiler: $Compiler.Example0
+          source: $Source.Example0
   
   Compiler:
     docs: The compiler of the agent
     enum:
       - js
+    examples: 
+      - name: Example0 
+        value: js
   
   GetAgentLogsResponse:
     properties:
       pagination: optional<commons.Pagination>
       data: optional<list<AgentLog>>
+    examples:
+      - name: Example0 
+        value: 
+          pagination: $commons.Pagination.Example0
+          data: $AgentLog.Example0
 
   AgentLog:
     docs: A log of an agent execution
@@ -90,4 +111,10 @@ types:
       log:
         docs: The log of the agent execution
         type: optional<string>
-        
+    examples: 
+      - name: Example0 
+        value: 
+          eventId: us_evt_9cuesESa7W9cuesE
+          success: true
+          createdAt: '2022-09-18T00:19:57.007Z'
+          log: SUCCESS       
