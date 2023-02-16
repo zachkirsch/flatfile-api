@@ -46,14 +46,14 @@ service:
       request: EnvironmentConfig
       response: Environment
 
-    getAllAgentLogs:
+    getAgentLogs:
       path: /{environmentId}/logs
       method: GET
       display-name: Get all agent logs for an environment
       path-parameters:
         environmentId: string
       request:
-        name: GetAllAgentLogsRequest
+        name: GetAgentLogsRequest
         query-parameters:
           pageSize:
             docs: Number of logs to return in a page (default 20)
@@ -61,7 +61,7 @@ service:
           pageNumber:
             docs: Based on pageSize, which page of records to return
             type: optional<integer>
-      response: agents.AgentLogs
+      response: agents.GetAgentLogsResponse
 
 types:
   ListEnvironmentsResponse:
@@ -99,3 +99,4 @@ types:
     enum:
       - shared_link
       - magic_link
+      

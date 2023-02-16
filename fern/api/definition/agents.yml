@@ -2,6 +2,7 @@
 
 imports:
   commons: commons.yml
+  events: events.yml
 
 service:
   auth: false
@@ -19,7 +20,7 @@ service:
       path: /agents
       method: POST
       display-name: Create an agent
-      request: AgentConfig
+      request: Agent
       response: AgentResponse
       errors: 
         - commons.BadRequestError
@@ -29,7 +30,7 @@ service:
       method: GET
       display-name: Get an agent
       path-parameters:
-        agentId: string
+        agentId: commons.AgentId
       response: AgentResponse
       errors: 
         - commons.BadRequestError
@@ -40,17 +41,13 @@ service:
       method: GET
       display-name: Get logs for an agent
       path-parameters:
-        agentId: string
+        agentId: commons.AgentId
       response: GetAgentLogsResponse
       errors: 
         - commons.BadRequestError
         - commons.NotFoundError
 
 types:
-  AgentId:
-    docs: Agent ID
-    type: string
-    
   ListAgentsResponse:
     properties:
       data: optional<list<Agent>>
@@ -64,13 +61,18 @@ types:
     properties:
       topics:
         docs: The topics the agent should listen for
-        type: optional<list<EventTopic>>
+        type: optional<list<events.EventTopic>>
       compiler:
         docs: The compiler of the agent
         type: optional<Compiler>
       source:
         docs: The source of the agent
         type: optional<string>
+  
+  Compiler:
+    docs: The compiler of the agent
+    enum:
+      - js
   
   GetAgentLogsResponse:
     properties:

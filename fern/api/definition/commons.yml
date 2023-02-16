@@ -2,6 +2,10 @@
 
 types:
 
+  AgentId:
+    docs: Agent ID
+    type: string
+
   AccountId:
     docs: Account ID
     type: string
@@ -54,13 +58,12 @@ types:
     docs: Space Config ID
     type: string
   
-  Compiler:
-    docs: The compiler of the agent
-    enum:
-      - js
+  RecordId:
+    docs: Record ID
+    type: string
 
-  ActionName:
-    docs: Name of an action
+  FieldId:
+    docs: Field ID
     type: string
 
   Pagination:
@@ -82,65 +85,28 @@ types:
       label: string
       type: optional<string>
       description: optional<string>
+  
+  SortDirection: 
+    enum: 
+      - asc 
+      - desc
 
   Success:
     docs: Informs whether or not a request was successful
     properties:
       success: boolean
   
-  Trigger:
-    docs: the type of trigger to use for this job
-    enum:
-      - manual
-      - immediate
-
-  FileOrWorkbookId:
-    docs: The id of a file or workbook
-    type: string
-
-  Certainty:
-    enum:
-      - absolute
-      - strong
-      - moderate
-      - weak
-
-  Metadata:
-    properties:
-      certainty: optional<Certainty>
-      source: optional<string>
-
-  Constraint:
-    union:
-      required: {}
-      unique: UniqueConstraint
-      computed: {}
-
-  UniqueConstraint:
-    properties:
-      config: optional<UniqueConstraintConfig>
-
-  UniqueConstraintConfig:
-    properties:
-      case_sensitive:
-        type: boolean
-        docs: Ignore casing when determining uniqueness
-      ignore_empty:
-        type: boolean
-        docs: Do not flag empty values as duplicate
-
-  Blueprint:
-    docs: Properties used to create a new Blueprint
-    properties:
-      slug: string
-      name: string
-      primary: optional<boolean>
-      sheets: list<SheetConfig>
-  
   Error: 
     properties: 
       key: optional<string>
       message: string
+  
+  Filter:
+    enum:
+      - valid
+      - error
+      - all
+      - none
 
 errors: 
   BadRequestError: 

@@ -97,12 +97,6 @@ types:
       id: commons.SpaceId
       lastAccessed: optional<datetime>
 
-  ApiTokens: 
-    docs: List of api tokens without secrets
-    properties:
-      pagination: optional<commons.Pagination>
-      data: list<commons.ApiToken>
-
   Invite: 
     properties:
       guestId: commons.GuestId 

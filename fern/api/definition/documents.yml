@@ -16,7 +16,7 @@ service:
       method: GET
       docs: Returns all documents for a space
       display-name: List documents
-      response: GetAllDocumentsResponse
+      response: ListDocumentsResponse
       errors: 
         - commons.BadRequestError
         - commons.NotFoundError

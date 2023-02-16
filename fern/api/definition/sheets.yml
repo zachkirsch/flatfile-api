@@ -15,10 +15,6 @@ service:
       method: GET
       docs: Returns sheets in a workbook
       display-name: List sheets
-      path-parameters:
-        workbookId:
-          docs: ID of workbook
-          type: string
       response: ListSheetsResponse
 
     get:
@@ -86,7 +82,13 @@ service:
         sheetId:
           docs: ID of sheet
           type: commons.SheetId
-      request: RecordsUpdates
+      request:
+        name: UpdateRecordsRequest
+        body: 
+          properties: 
+            id: commons.RecordId
+            versionId: optional<commons.VersionId>
+            values: RecordData
       response: RecordsResponse
 
     insertRecords:
@@ -301,7 +303,7 @@ types:
   Sheet:
     docs: A place to store tabular data
     properties:
-      id: SheetId
+      id: commons.SheetId
       name: string
       config: optional<SheetConfig>
 
@@ -321,7 +323,7 @@ types:
   RecordsResponseData:
     docs: A list of records with optional record counts
     extends:
-      - Success
+      - commons.Success
     properties:
       records: optional<RecordsWithLinks>
       counts: optional<RecordCounts>
@@ -423,11 +425,6 @@ types:
     properties:
       id: optional<commons.RecordId>
       counts: optional<RecordCounts>
-
-  SortDirection: 
-    enum: 
-      - asc 
-      - desc
   
   CreateSheetVersionResponse: 
     properties: 

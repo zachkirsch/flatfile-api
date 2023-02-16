@@ -119,3 +119,22 @@ types:
         name: has_one
       - value: has-many
         name: has_many
+  
+  Constraint:
+    union:
+      required: {}
+      unique: UniqueConstraint
+      computed: {}
+
+  UniqueConstraint:
+    properties:
+      config: optional<UniqueConstraintConfig>
+
+  UniqueConstraintConfig:
+    properties:
+      case_sensitive:
+        type: boolean
+        docs: Ignore casing when determining uniqueness
+      ignore_empty:
+        type: boolean
+        docs: Do not flag empty values as duplicate

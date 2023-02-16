@@ -3,6 +3,7 @@
 imports:
   root: __package__.yml
   commons: ../commons.yml
+  sheets: ../sheets.yml
 
 service:
   auth: true
@@ -64,6 +65,14 @@ types:
       name: string
       blueprints: list<Blueprint>
       actions: optional<list<commons.Action>>
+  
+  Blueprint:
+    docs: Properties used to create a new Blueprint
+    properties:
+      slug: string
+      name: string
+      primary: optional<boolean>
+      sheets: list<sheets.SheetConfig>
   
   SpacePattern: 
     extends: SpacePatternConfig

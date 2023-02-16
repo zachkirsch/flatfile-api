@@ -33,7 +33,7 @@ service:
       method: GET
       display-name: Get a job
       path-parameters:
-        jobId: commons.Jobid
+        jobId: commons.JobId
       response: Job
 
     delete:
@@ -115,7 +115,7 @@ types:
         docs: the type of operation to perform on the data
         type: optional<Operation>
       source: FileOrWorkbookId
-      destination: optional<WorkbookId>
+      destination: optional<commons.WorkbookId>
       config: 
         # Flatfile should be using a discriminated union here.
         type: unknown
@@ -130,26 +130,19 @@ types:
         docs: the progress of the job
         type: optional<double>
   
+  FileOrWorkbookId:
+    docs: The id of a file or workbook
+    type: string
+  
   DeleteJobConfig:
     docs: The configuration for a delete job
     properties:
-      filter: Filter
+      filter: commons.Filter
       filterField:
         docs: Name of field by which to filter records
         type: optional<string>
-      sheet: SheetId
-      exceptions: optional<list<RecordId>>
-
-  Filter:
-    enum:
-      - valid
-      - error
-      - all
-      - none
-
-  RecordId:
-    docs: Record ID
-    type: string
+      sheet: commons.SheetId
+      exceptions: optional<list<commons.RecordId>>
 
   FileJobConfig:
     properties:
@@ -161,11 +154,17 @@ types:
     docs: The driver to use for extracting data from the file
     enum:
       - csv
+  
+  Trigger:
+    docs: the type of trigger to use for this job
+    enum:
+      - manual
+      - immediate
 
   PipelineJobConfig:
     properties:
-      sourceSheetId: SheetId
-      destinationSheetId: SheetId
+      sourceSheetId: commons.SheetId
+      destinationSheetId: commons.SheetId
 
   JobType:
     docs: The type of job
@@ -254,6 +253,18 @@ types:
       mapping: optional<list<CategoryMapping>>
       unusedSourceValues: optional<list<string>>
       unusedDestinationValues: optional<list<string>>
+
+  Metadata:
+    properties:
+      certainty: optional<Certainty>
+      source: optional<string>
+
+  Certainty:
+    enum:
+      - absolute
+      - strong
+      - moderate
+      - weak
   
   CategoryMapping:
     properties:

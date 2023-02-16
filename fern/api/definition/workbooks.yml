@@ -61,7 +61,7 @@ types:
   Workbook: 
     docs: A collection of one or more sheets 
     properties:
-      id: WorkbookId
+      id: commons.WorkbookId
       name: optional<string>
       spaceId: commons.SpaceId 
       environmentId: optional<commons.EnvironmentId>

@@ -27,15 +27,14 @@ service:
           sortDirection: optional<commons.SortDirection>
       response: ListSpacesResponse
       errors: 
-        - commons.BadRequest
+        - commons.BadRequestError
 
     create:
       path: ""
       method: POST
       docs: Creates a new space based on an existing Space Config
       display-name: Create a space
-      request:
-        body: SpaceRequest
+      request: SpaceConfig
       response: SpaceResponse
 
     get:
@@ -69,9 +68,7 @@ service:
         spaceId:
           docs: ID of space to update
           type: commons.SpaceId
-      request:
-        name: UpdateSpaceRequest
-        body: SpaceRequest
+      request: SpaceConfig
       response: SpaceResponse
 
     getEventToken:

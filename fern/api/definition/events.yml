@@ -170,6 +170,15 @@ types:
   
   UserOnlineEvent: 
     extends: BaseEvent
+
+  UserOfflineEvent:
+    extends: BaseEvent
+  
+  UploadStartedEvent: 
+    extends: BaseEvent
+  
+  UploadFailedEvent: 
+    extends: BaseEvent
   
   UploadCompletedEvent: 
     extends: BaseEvent
@@ -228,7 +237,7 @@ types:
 
   JobPayload: 
     properties: 
-      type: JobType
+      type: JobPayloadType
       operation: JobOperationType
   
   JobFailedPayload: 
@@ -236,7 +245,7 @@ types:
     properties: 
       err: string
 
-  JobType: 
+  JobPayloadType: 
     enum: 
       - FILE
       - PIPELINE
@@ -346,6 +355,10 @@ types:
       jobId: optional<commons.JobId>
       fileId: optional<commons.FileId>
       precedingEventId: optional<commons.EventId>
+  
+  ActionName:
+    docs: Name of an action
+    type: string
 
   Progress:
     docs: The progress of the event within a collection of iterable events

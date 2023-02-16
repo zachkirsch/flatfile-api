@@ -15,7 +15,7 @@ service:
         name: ListFilesRequest
         query-parameters:
           spaceId: optional<string>
-      response: Files
+      response: ListFilesResponse
 
     upload:
       path: ""
@@ -30,7 +30,7 @@ service:
             file:
               type: string 
               docs: A binary payload containing the file contents
-      response: commons.File
+      response: FileResponse
 
     get:
       path: /{fileId}
@@ -63,9 +63,9 @@ service:
           properties:
             workbookId: commons.WorkbookId 
             status: 
-              type: commons.ModelFileStatusEnum
+              type: ModelFileStatusEnum
               docs: Status of the file
-      response: commons.File
+      response: FileResponse
 
     download:
       path: /{fileId}/download
