@@ -52,7 +52,7 @@ service:
 types:
   ListWorkbooksResponse:
     properties:
-      data: optional<list<Workbook>>
+      data: list<Workbook>
   
   WorkbookResponse: 
     properties: 
