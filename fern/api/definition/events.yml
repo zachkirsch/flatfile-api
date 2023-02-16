@@ -1,0 +1,385 @@
+# yaml-language-server: $schema=https://raw.githubusercontent.com/fern-api/fern/main/fern.schema.json
+
+imports:
+  commons: commons.yml
+
+service:
+  auth: true
+  base-path: /environments/{environmentId}/events
+  path-parameters:
+    environmentId: commons.EnvironmentId
+  endpoints:
+    list:
+      path: ""
+      method: GET
+      docs: Event topics that the Flatfile Platform emits.
+      display-name: List events
+      request:
+        name: ListEventsRequest
+        query-parameters:
+          spaceId: optional<string>
+          domain:
+            docs: Filter by event domain
+            type: optional<string>
+          topic:
+            docs: Filter by event topic
+            type: optional<string>
+          since:
+            docs: Filter by event timestamp
+            type: optional<string>
+          pageSize:
+            docs: Number of tokens to return in a page (default 10)
+            type: optional<integer>
+          pageNumber:
+            docs: Based on pageSize, which page of records to return
+            type: optional<integer>
+          includeAcknowledged:
+            docs: Include acknowledged events
+            type: optional<boolean>
+      response: ListAllEventsResponse
+
+    create:
+      path: ""
+      method: POST
+      display-name: Create an event
+      request: Event
+      response: EventResponse
+      errors: 
+        - commons.BadRequestError
+        - commons.NotFoundError
+
+    get:
+      path: /{eventId}
+      method: GET
+      display-name: Get an event
+      path-parameters:
+        eventId:
+          docs: The event id
+          type: commons.EventId
+      response: EventResponse
+
+    ack:
+      path: /{eventId}/ack
+      method: POST
+      display-name: Acknowledge an event
+      path-parameters:
+        eventId:
+          docs: The event id
+          type: commons.EventId
+      response: commons.Success
+  
+types:
+  ListAllEventsResponse:
+    properties:
+      data: optional<list<Event>>
+  
+  EventResponse:
+    properties:
+      data: optional<Event>
+
+  Event:
+    docs: Properties used to create a new event
+    union: 
+      space:added: 
+        name: spaceAdded
+        type: SpaceAddedEvent
+      space:removed: 
+        name: spaceRemoved
+        type: SpaceRemovedEvent
+      workbook:added: 
+        name: workbookAdded
+        type: WorkbookAddedEvent
+      workbook:removed: 
+        name: workbookRemoved
+        type: WorkbookRemovedEvent
+      user:added: 
+        name: userAdded
+        type: UserAddedEvent
+      user:removed:
+        name: userRemoved
+        type: UserRemovedEvent
+      user:online:
+        name: userOnline
+        type: UserOnlineEvent
+      user:offline:
+        name: userOffline
+        type: UserOfflineEvent
+      upload:started:
+        name: uploadStarted
+        type: UploadStartedEvent
+      upload:failed:
+        name: uploadFailed
+        type: UploadFailedEvent
+      upload:completed:
+        name: uploadCompleted
+        type: UploadCompletedEvent
+      job:started:
+        name: jobStarted
+        type: JobStartedEvent
+      job:waiting:
+        name: jobWaiting
+        type: JobWaitingEvent
+      job:updated:
+        name: jobUpdated
+        type: JobUpdatedEvent
+      job:failed:
+        name: jobFailed
+        type: JobFailedEvent
+      job_completed:
+        name: jobCompleted
+        type: JobCompletedEvent
+      job:deleted:
+        name: jobDeleted
+        type: JobDeletedEvent
+      records:created:
+        name: recordsCreated
+        type: RecordsCreatedEvent
+      records:updated:
+        name: recordsUpdated
+        type: RecordsUpdatedEvent
+      records:deleted:
+        name: recordsDeleted
+        type: RecordsDeletedEvent
+      sheet:validated:
+        name: sheetValidated
+        type: SheetValidatedEvent
+      action:triggered:
+        name: actionTriggered
+        type: ActionTriggeredEvent
+      file:deleted:
+        name: fileDeleted
+        type: FileDeletedEvent
+      
+  SpaceAddedEvent:
+    extends: BaseEvent
+  
+  SpaceRemovedEvent: 
+    extends: BaseEvent
+
+  WorkbookAddedEvent: 
+    extends: BaseEvent
+  
+  WorkbookRemovedEvent: 
+    extends: BaseEvent
+  
+  UserAddedEvent: 
+    extends: BaseEvent
+  
+  UserRemovedEvent: 
+    extends: BaseEvent
+  
+  UserOnlineEvent: 
+    extends: BaseEvent
+
+  UserOfflineEvent:
+    extends: BaseEvent
+  
+  UploadStartedEvent: 
+    extends: BaseEvent
+  
+  UploadFailedEvent: 
+    extends: BaseEvent
+  
+  UploadCompletedEvent: 
+    extends: BaseEvent
+  
+  JobStartedEvent: 
+    extends: BaseEvent
+    properties: 
+      payload: JobPayload
+  
+  JobWaitingEvent: 
+    extends: BaseEvent
+
+  JobUpdatedEvent: 
+    extends: BaseEvent
+    properties: 
+      payload: JobPayload
+  
+  JobFailedEvent: 
+    extends: BaseEvent
+    properties: 
+      payload: JobFailedPayload
+  
+  JobCompletedEvent: 
+    extends: BaseEvent
+    properties: 
+      payload: JobPayload
+  
+  JobDeletedEvent: 
+    extends: BaseEvent
+  
+  RecordsCreatedEvent: 
+    extends: BaseEvent
+    properties: 
+      payload: RecordsPayload
+  
+  RecordsUpdatedEvent: 
+    extends: BaseEvent
+    properties: 
+      payload: RecordsPayload
+  
+  RecordsDeletedEvent: 
+    extends: BaseEvent
+  
+  SheetValidatedEvent: 
+    extends: BaseEvent
+  
+  ActionTriggeredEvent: 
+    extends: BaseEvent
+  
+  FileDeletedEvent: 
+    extends: BaseEvent
+  
+  RecordsPayload: 
+    properties: 
+      count: integer
+
+  JobPayload: 
+    properties: 
+      type: JobPayloadType
+      operation: JobOperationType
+  
+  JobFailedPayload: 
+    extends: JobPayload
+    properties: 
+      err: string
+
+  JobPayloadType: 
+    enum: 
+      - FILE
+      - PIPELINE
+  
+  JobOperationType: 
+    enum: 
+      - EXTRACT
+      - MAP
+
+  BaseEvent:
+    properties:
+      domain:
+        docs: The domain of the event
+        type: Domain
+      topic: EventTopic
+      context:
+        docs: The context of the event
+        type: Context
+      attributes:
+        docs: The attributes of the event
+        type: optional<EventAttributes>
+      callbackUrl:
+        docs: The callback url to acknowledge the event
+        type: optional<string>
+      dataUrl:
+        docs: The url to retrieve the data associated with the event
+        type: optional<string>
+      createdAt:
+        docs: Date the event was created
+        type: optional<string>
+      acknowledgedAt:
+        docs: Date the event was acknowledged
+        type: optional<string>
+      acknowledgedBy:
+        docs: The actor (user or system) who acknowledged the event
+        type: optional<string>
+
+  EventTopic:
+    docs: The topic of the event
+    enum:
+      - value: space:added
+        name: space_added
+      - value: space:removed
+        name: space_removed
+      - value: workbook:added
+        name: workbook_added
+      - value: workbook:removed
+        name: workbook_removed
+      - value: user:added
+        name: user_added
+      - value: user:removed
+        name: user_removed
+      - value: user:online
+        name: user_online
+      - value: user:offline
+        name: user_offline
+      - value: upload:started
+        name: upload_started
+      - value: upload:failed
+        name: upload_failed
+      - value: upload:completed
+        name: upload_completed
+      - value: job:started
+        name: job_started
+      - value: job:waiting
+        name: job_waiting
+      - value: job:updated
+        name: job_updated
+      - value: job:failed
+        name: job_failed
+      - value: job:completed
+        name: job_completed
+      - value: job:deleted
+        name: job_deleted
+      - value: records:created
+        name: records_created
+      - value: records:updated
+        name: records_updated
+      - value: records:deleted
+        name: records_deleted
+      - value: sheet:validated
+        name: sheet_validated
+      - value: action:triggered
+        name: action_triggered
+      - value: file:deleted
+        name: file_deleted
+
+  Domain:
+    docs: The domain of the event
+    enum:
+      - file
+      - space
+      - workbook
+      - job
+
+  Context:
+    docs: The context of the event
+    properties:
+      actionName: optional<ActionName>
+      accountId: commons.AccountId
+      environmentId: commons.EnvironmentId
+      spaceId: optional<commons.SpaceId>
+      workbookId: optional<commons.WorkbookId>
+      sheetId: optional<commons.SheetId>
+      sheetSlug: optional<SheetSlug>
+      versionId: optional<commons.VersionId>
+      jobId: optional<commons.JobId>
+      fileId: optional<commons.FileId>
+      precedingEventId: optional<commons.EventId>
+  
+  ActionName:
+    docs: Name of an action
+    type: string
+
+  Progress:
+    docs: The progress of the event within a collection of iterable events
+    properties:
+      current:
+        docs: The current progress of the event
+        type: optional<integer>
+      total:
+        docs: The total number of events in this group
+        type: optional<integer>
+      percent:
+        docs: The percent complete of the event group
+        type: optional<integer>
+
+  EventAttributes:
+    docs: The attributes of the event
+    properties:
+      progress:
+        docs: The progress of the event within a collection of iterable events
+        type: optional<Progress>
+  
+  SheetSlug:
+    docs: Sheet Slug
+    type: string

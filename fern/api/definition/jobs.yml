@@ -2,83 +2,49 @@
 
 imports:
   commons: commons.yml
+  property: property.yml
 
 service:
-  auth: false
+  auth: true
   base-path: /jobs
   endpoints:
-    getJobs:
+    list:
       path: ""
       method: GET
       display-name: List jobs
       request:
+        name: ListJobsRequest
         query-parameters:
-          environmentId: optional<string>
-          spaceId: optional<string>
-          workbookId: optional<string>
-          fileId: optional<string>
-      response: Jobs
+          environmentId: optional<commons.EnvironmentId>
+          spaceId: optional<commons.SpaceId>
+          workbookId: optional<commons.WorkbookId>
+          fileId: optional<commons.FileId>
+      response: ListJobsResponse
 
-    createJob:
+    create:
       path: ""
       method: POST
       display-name: Create a job
-      request:
-        body: "#/components/requestBodies/Job"
-      response: commons.Job
+      request: JobConfig
+      response: Job
 
-    getJob:
+    get:
       path: /{jobId}
       method: GET
       display-name: Get a job
       path-parameters:
-        jobId: string
-      response: commons.Job
+        jobId: commons.JobId
+      response: Job
 
-    deleteJob:
+    delete:
       path: /{jobId}
       method: DELETE
       display-name: Delete a job
       path-parameters:
-        jobId: string
+        jobId: commons.JobId
       response: commons.Success
 
-    getJobExecutionPlan:
-      path: /{jobId}/plan
-      method: GET
-      docs: Returns a single job's execution plan
-      display-name: Get a job's execution plan
-      path-parameters:
-        jobId:
-          docs: ID of job to return
-          type: string
-      response: JobPlan
-
-    updateJobExecutionPlanById:
-      path: /{jobId}/plan
-      method: PUT
-      docs: Update a job's entire execution plan
-      display-name: Replace a job's plan
-      path-parameters:
-        jobId:
-          docs: ID of job to return
-          type: string
-      request:
-        body: commons.#/components/requestBodies/Plan
-
-    updateJobExecutionPlanFields:
-      path: /{jobId}/plan
-      method: PATCH
-      docs: Update a one or more individual fields on a job's execution plan
-      display-name: Update a job's plan
-      path-parameters:
-        jobId:
-          docs: ID of job to return
-          type: string
-      request:
-        body: commons.#/components/requestBodies/Plan
-
-    executeJob:
+    execute:
       path: /{jobId}/execute
       method: POST
       docs: Execute a job and return the job
@@ -87,12 +53,220 @@ service:
         jobId:
           docs: ID of job to return
           type: string
+      response: commons.Success
+
+    getExecutionPlan:
+      path: /{jobId}/plan
+      method: GET
+      docs: Returns a single job's execution plan
+      display-name: Get a job's execution plan
+      path-parameters:
+        jobId:
+          docs: ID of job to return
+          type: commons.JobId
+      response: JobPlan
+
+    updateExecutionPlan:
+      path: /{jobId}/plan
+      method: PUT
+      docs: Update a job's entire execution plan
+      display-name: Replace a job's plan
+      path-parameters:
+        jobId:
+          docs: ID of job to return
+          type: commons.JobId
+      request: JobExecutionPlanConfig
+      response: JobPlan
+
+    updateExecutionPlanFields:
+      path: /{jobId}/plan
+      method: PATCH
+      docs: Update a one or more individual fields on a job's execution plan
+      display-name: Update a job's plan
+      path-parameters:
+        jobId:
+          docs: ID of job to return
+          type: string
+      request: JobExecutionPlanConfig
+      response: JobPlan
 
 types:
-  Jobs:
+  ListJobsResponse:
     properties:
-      data: optional<list<commons.Job>>
+      data: optional<list<Job>>
+  
+  JobResponse:
+    properties:
+      data: optional<Job>
+
+  Job: 
+    docs: A single unit of work that will execute asynchronously
+    extends: JobConfig
+    properties: 
+      id: commons.JobId
+
+  JobConfig:
+    docs: A single unit of work that a pipeline will execute
+    properties:
+      type:
+        docs: The type of job
+        type: JobType
+      operation:
+        docs: the type of operation to perform on the data
+        type: optional<Operation>
+      source: FileOrWorkbookId
+      destination: optional<commons.WorkbookId>
+      config: 
+        # Flatfile should be using a discriminated union here.
+        type: unknown
+        docs: Can either be a `DeleteJobConfig`, a `FileJobConfig` or a `PipelineJobConfig`. 
+      trigger:
+        docs: the type of trigger to use for this job
+        type: optional<Trigger>
+      status:
+        docs: the status of the job
+        type: optional<JobStatus>
+      progress:
+        docs: the progress of the job
+        type: optional<double>
+  
+  FileOrWorkbookId:
+    docs: The id of a file or workbook
+    type: string
+  
+  DeleteJobConfig:
+    docs: The configuration for a delete job
+    properties:
+      filter: commons.Filter
+      filterField:
+        docs: Name of field by which to filter records
+        type: optional<string>
+      sheet: commons.SheetId
+      exceptions: optional<list<commons.RecordId>>
+
+  FileJobConfig:
+    properties:
+      driver:
+        docs: The driver to use for extracting data from the file
+        type: Driver
+
+  Driver:
+    docs: The driver to use for extracting data from the file
+    enum:
+      - csv
+  
+  Trigger:
+    docs: the type of trigger to use for this job
+    enum:
+      - manual
+      - immediate
+
+  PipelineJobConfig:
+    properties:
+      sourceSheetId: commons.SheetId
+      destinationSheetId: commons.SheetId
+
+  JobType:
+    docs: The type of job
+    enum:
+      - file
+      - workbook
+
+  Operation:
+    docs: the type of operation to perform on the data
+    enum:
+      - extract
+      - map
+      - value: delete-records
+        name: delete_records
+
+  JobStatus:
+    docs: the status of the job
+    enum:
+      - planning
+      - ready
+      - executing
+      - complete
+      - failed
+
+  JobPlanObject:
+    properties:
+      data: optional<JobPlan>
 
   JobPlan:
+    docs: The job/plan tuple that contains the full plan and the jobs status
     properties:
-      data: optional<commons.JobPlan>
+      job: optional<Job>
+      plan: optional<JobExecutionPlan>
+  
+  JobExecutionPlanConfig: 
+    extends: JobExecutionPlan
+    properties: 
+      fileId: commons.FileId
+      jobId: commons.JobId
+
+  JobExecutionPlan:
+    docs: >-
+      The execution plan for a job, for example, for a map job, the execution
+      plan is the mapping of the source sheet to the destination sheet.
+    properties:
+      fieldMapping:
+        type: optional<list<Edge>>
+      unmappedSourceFields: optional<list<SourceField>>
+      unmappedDestinationFields: optional<list<DestinationField>>
+      headerRowCount:
+        docs: The number of rows to skip before reading data from the document
+        type: optional<integer>
+  
+  Edge: 
+    properties:
+      sourceField: property.Property
+      destinationField: property.Property
+      preview: optional<list<string>>
+      enumDetails:
+        docs: >-
+          Only available if one or more of the destination fields is of type
+          enum. Provides category mapping.
+        type: optional<EnumDetails>
+      metadata: optional<Metadata>
+  
+  SourceField:
+    properties:
+      sourceField: property.Property
+      preview: optional<list<string>>
+
+  DestinationField:
+    properties:
+      enumDetails:
+        docs: >-
+          Only available if one or more of the destination fields is of type
+          enum. Provides category mapping.
+        type: optional<EnumDetails>
+      destinationField: property.Property
+      preview: optional<list<string>>
+
+  EnumDetails:
+    docs: >-
+      Only available if one or more of the destination fields is of type enum.
+      Provides category mapping.
+    properties:
+      mapping: optional<list<CategoryMapping>>
+      unusedSourceValues: optional<list<string>>
+      unusedDestinationValues: optional<list<string>>
+
+  Metadata:
+    properties:
+      certainty: optional<Certainty>
+      source: optional<string>
+
+  Certainty:
+    enum:
+      - absolute
+      - strong
+      - moderate
+      - weak
+  
+  CategoryMapping:
+    properties:
+      sourceValue: optional<string>
+      destinationValue: optional<string>

@@ -1,91 +1,44 @@
-# yaml-language-server: $schema=https://raw.githubusercontent.com/fern-api/fern/main/fern.schema.json
-
-imports:
+imports: 
+  property: property.yml
   commons: commons.yml
-  root: __package__.yml
 
-service:
-  auth: false
-  base-path: /workbooks
-  endpoints:
-    getAllWorkbooks:
+service: 
+  auth: true
+  base-path: /workbooks/{workbookId}/sheets
+  path-parameters:
+    workbookId:
+      docs: ID of workbook
+      type: commons.WorkbookId
+  endpoints: 
+    list:
       path: ""
-      method: GET
-      docs: Returns all workbooks matching a filter for an account or space
-      display-name: List workbooks
-      request:
-        query-parameters:
-          spaceId: optional<string>
-      response: Workbooks
-
-    addWorkbook:
-      path: ""
-      method: POST
-      docs: Creates a workbook and adds it to a space
-      display-name: Create a workbook
-      request:
-        body: "#/components/requestBodies/WorkbookConfig"
-
-    getWorkbookById:
-      path: /{workbookId}
-      method: GET
-      docs: Returns a single workbook
-      display-name: Get a workbook
-      path-parameters:
-        workbookId:
-          docs: ID of workbook to return
-          type: string
-      response: commons.Workbook
-
-    deleteWorkbookById:
-      path: /{workbookId}
-      method: DELETE
-      docs: Delete a workbook
-      display-name: Delete a workbook
-      path-parameters:
-        workbookId:
-          docs: ID of workbook to delete
-          type: string
-      response: commons.Success
-
-    getSheets:
-      path: /{workbookId}/sheets
       method: GET
       docs: Returns sheets in a workbook
       display-name: List sheets
-      path-parameters:
-        workbookId:
-          docs: ID of workbook
-          type: string
-      response: Sheets
+      response: ListSheetsResponse
 
-    getSheet:
-      path: /{workbookId}/sheets/{sheetId}
+    get:
+      path: /{sheetId}
       method: GET
       docs: Returns a sheet in a workbook
       display-name: Get a sheet
       path-parameters:
-        workbookId:
-          docs: ID of workbook
-          type: string
         sheetId:
           docs: ID of sheet
-          type: string
-      response: Sheet
+          type: commons.SheetId
+      response: SheetResponse
 
     getRecords:
-      path: /{workbookId}/sheets/{sheetId}/records
+      path: /{sheetId}/records
       method: GET
       docs: Returns records from a sheet in a workbook
       display-name: Get records
       path-parameters:
-        workbookId:
-          docs: ID of workbook
-          type: string
         sheetId:
           docs: ID of sheet
-          type: string
+          type: commons.SheetId
       request:
+        name: GetRecordsRequest
         query-parameters:
           versionId: optional<string>
           sortField:
@@ -93,7 +46,7 @@ service:
             type: optional<string>
           sortDirection:
             docs: Sort direction - asc (ascending) or desc (descending)
-            type: optional<__package__.SortDirection>
+            type: optional<commons.SortDirection>
           filter:
             docs: Options to filter records
             type: optional<commons.Filter>
@@ -118,66 +71,60 @@ service:
               Search the entire sheet for the given value, returning matching
               rows
             type: optional<string>
-      response: commons.RecordsResponse
+      response: RecordsResponse
 
     updateRecords:
-      path: /{workbookId}/sheets/{sheetId}/records
+      path: /{sheetId}/records
       method: PUT
       docs: Updates existing records in a workbook sheet
       display-name: Update records
       path-parameters:
-        workbookId:
-          docs: ID of workbook
-          type: string
         sheetId:
           docs: ID of sheet
-          type: string
+          type: commons.SheetId
       request:
-        body: "#/components/requestBodies/RecordsUpdates"
-      response: commons.RecordsResponse
+        name: UpdateRecordsRequest
+        body: 
+          properties: 
+            id: commons.RecordId
+            versionId: optional<commons.VersionId>
+            values: RecordData
+      response: RecordsResponse
 
-    addRecords:
-      path: /{workbookId}/sheets/{sheetId}/records
+    insertRecords:
+      path: /{sheetId}/records
       method: POST
       docs: Adds records to a workbook sheet
       display-name: Insert records
       path-parameters:
-        workbookId:
-          docs: ID of workbook
-          type: string
         sheetId:
           docs: ID of sheet
-          type: string
-      request:
-        body: "#/components/requestBodies/RecordsData"
+          type: commons.SheetId
+      request: list<RecordData>
+      response: RecordsResponse
 
     deleteRecords:
-      path: /{workbookId}/sheets/{sheetId}/records
+      path: /{sheetId}/records
       method: DELETE
       docs: Deletes records from a workbook sheet
       display-name: Delete records
       path-parameters:
-        workbookId:
-          docs: ID of workbook
-          type: string
         sheetId:
           docs: ID of sheet
-          type: string
+          type: commons.SheetId
       response: commons.Success
 
-    getRecordsCsv:
-      path: /{workbookId}/sheets/{sheetId}/download
+    getRecordsAsCsv:
+      path: /{sheetId}/download
       method: GET
       docs: Returns records from a sheet in a workbook as a csv file
       display-name: Download records as a CSV file
       path-parameters:
-        workbookId:
-          docs: ID of workbook
-          type: string
         sheetId:
           docs: ID of sheet
-          type: string
+          type: commons.SheetId
       request:
+        name: GetRecordsCsvRequest
         query-parameters:
           versionId: optional<string>
           sortField:
@@ -185,35 +132,33 @@ service:
             type: optional<string>
           sortDirection:
             docs: Sort direction - asc (ascending) or desc (descending)
-            type: optional<__package__.SortDirection>
+            type: optional<commons.SortDirection>
           filter:
             docs: Options to filter records
             type: optional<commons.Filter>
           filterField:
             docs: Name of field by which to filter records
             type: optional<string>
-      response: DownloadCsv
+      response: string
 
     getFields:
-      path: /{workbookId}/sheets/{sheetId}/fields
+      path: /{sheetId}/fields
       method: GET
       docs: Returns fields from a sheet in a workbook
       display-name: Get fields
       path-parameters:
-        workbookId:
-          docs: ID of workbook
-          type: string
         sheetId:
           docs: ID of sheet
-          type: string
+          type: commons.SheetId
       request:
+        name: GetFieldsRequest
         query-parameters:
           sortField:
             docs: Name of field by which to sort records
             type: optional<string>
           sortDirection:
             docs: Sort direction - asc (ascending) or desc (descending)
-            type: optional<__package__.SortDirection>
+            type: optional<commons.SortDirection>
           filter:
             docs: Options to filter records
             type: optional<commons.Filter>
@@ -231,31 +176,29 @@ service:
           distinct:
             docs: When true, excludes duplicate values
             type: optional<boolean>
-      response: commons.Fields
+      response: GetFieldsResponse
 
     getField:
-      path: /{workbookId}/sheets/{sheetId}/fields/{fieldId}
+      path: /{sheetId}/fields/{fieldId}
       method: GET
       docs: Returns a field from a sheet in a workbook
       display-name: Get a field
       path-parameters:
-        workbookId:
-          docs: ID of workbook
-          type: string
         sheetId:
           docs: ID of sheet
-          type: string
+          type: commons.SheetId
         fieldId:
           docs: ID of field
-          type: string
+          type: commons.FieldId
       request:
+        name: GetFieldRequest
         query-parameters:
           sortField:
             docs: Name of field by which to sort records
             type: optional<string>
           sortDirection:
             docs: Sort direction - asc (ascending) or desc (descending)
-            type: optional<__package__.SortDirection>
+            type: optional<commons.SortDirection>
           filter:
             docs: Options to filter records
             type: optional<commons.Filter>
@@ -270,29 +213,27 @@ service:
           distinct:
             docs: When true, excludes duplicate values
             type: optional<boolean>
-      response: commons.Fields
+      response: FieldResponse
 
     find:
-      path: /{workbookId}/sheets/{sheetId}/fields/{fieldId}/find/{searchValue}
+      path: /{sheetId}/fields/{fieldId}/find/{searchValue}
       method: GET
       docs: >-
         Searches for the given value in a field and returns the records that
         match the search criteria
       display-name: Find a value in a field
       path-parameters:
-        workbookId:
-          docs: ID of workbook
-          type: string
         sheetId:
           docs: ID of sheet
-          type: string
+          type: commons.SheetId
         fieldId:
           docs: ID of field
-          type: string
+          type: commons.FieldId
         searchValue:
           docs: The value to search for
           type: string
       request:
+        name: FindRecordsRequest
         query-parameters:
           pageSize:
             docs: >-
@@ -302,29 +243,27 @@ service:
           pageNumber:
             docs: Based on pageSize, which page of records to return
             type: optional<integer>
-      response: commons.RecordsResponse
+      response: RecordsResponse
 
-    replace:
-      path: /{workbookId}/sheets/{sheetId}/fields/{fieldId}/replace/{searchValue}
+    findAndReplace:
+      path: /{sheetId}/fields/{fieldId}/replace/{searchValue}
       method: PUT
       docs: >-
         Searches for the given searchValue in a field and replaces all instances
         of that value with replaceValue
       display-name: Find and replace a value in a field
       path-parameters:
-        workbookId:
-          docs: ID of workbook
-          type: string
         sheetId:
           docs: ID of sheet
-          type: string
+          type: commons.SheetId
         fieldId:
           docs: ID of field
-          type: string
+          type: commons.FieldId
         searchValue:
           docs: The value to search for
           type: string
       request:
+        name: FindAndReplaceRecordRequest
         query-parameters:
           pageSize:
             docs: >-
@@ -334,39 +273,159 @@ service:
           pageNumber:
             docs: Based on pageSize, which page of records to return
             type: optional<integer>
-        body: "#/components/requestBodies/RecordsReplace"
-      response: commons.RecordsResponse
+        body:
+          properties:
+            replace:
+              type: unknown 
+              docs: The value to replace found values with 
+      response: RecordsResponse
 
     createVersion:
-      path: /{workbookId}/sheets/{sheetId}/versions
+      path: /{sheetId}/versions
       method: POST
       docs: Creates a new version of a workbook sheet
       display-name: Create a version
       path-parameters:
-        workbookId:
-          docs: ID of workbook
-          type: string
         sheetId:
           docs: ID of sheet
-          type: string
+          type: commons.SheetId
+      response: CreateSheetVersionResponse
 
-types:
-  Workbooks:
+types: 
+  ListSheetsResponse: 
+    properties: 
+      data: list<Sheet>
+  
+  SheetResponse:
     properties:
-      data: optional<list<commons.Workbook>>
-
-  Sheets:
-    properties:
-      data: optional<list<commons.Sheet>>
+      data: optional<Sheet>
 
   Sheet:
+    docs: A place to store tabular data
     properties:
-      data: optional<commons.Sheet>
+      id: commons.SheetId
+      name: string
+      config: optional<SheetConfig>
 
-  Version:
+  SheetConfig:
+    docs: Describes shape of data as well as behavior
     properties:
-      data: optional<_InlinedType1>
+      name: string
+      description: optional<string>
+      slug: optional<string>
+      fields: list<property.Property>
+      actions: optional<list<commons.Action>>
 
-  _InlinedType1:
+  RecordsResponse:
     properties:
+      data: optional<RecordsResponseData>
+
+  RecordsResponseData:
+    docs: A list of records with optional record counts
+    extends:
+      - commons.Success
+    properties:
+      records: optional<RecordsWithLinks>
+      counts: optional<RecordCounts>
       versionId: optional<commons.VersionId>
+  
+  RecordCounts:
+    properties:
+      total: optional<double>
+      valid: optional<double>
+      error: optional<double>
+
+  RecordsWithLinks:
+    docs: List of Record objects, including links to related rows
+    type: list<RecordWithLinks>
+
+  RecordWithLinks:
+    docs: A single row of data in a Sheet, including links to related rows
+    properties:
+      id: commons.RecordId
+      workbookId: commons.WorkbookId
+      sheetId: commons.SheetId
+      values: RecordDataWithLinks
+
+  RecordDataWithLinks:
+    docs: A single row of data in a Sheet, including links to related rows
+    type: map<string, CellValueWithLinks>
+
+  CellValueWithLinks:
+    extends:
+      - CellValue
+    properties:
+      links: optional<Records>
+
+  Records:
+    docs: List of Record objects
+    type: list<Record>
+
+  Record:
+    docs: A single row of data in a Sheet
+    properties:
+      id: commons.RecordId
+      workbookId: commons.WorkbookId
+      sheetId: commons.SheetId
+      values: RecordData
+
+  RecordData:
+    docs: A single row of data in a Sheet
+    type: map<string, CellValue>
+
+  CellValue:
+    properties:
+      valid: optional<boolean>
+      messages: optional<list<ValidationMessage>>
+      value: 
+        docs: >- 
+          The type is a string | integer | boolean. 
+        type: unknown
+  
+  ValidationMessage:
+    docs: Record data validation messages
+    properties:
+      type: optional<ValidationType>
+      source: optional<ValidationSource>
+      message: optional<string>
+
+  ValidationType:
+    enum:
+      - error
+      - warn
+      - info
+
+  ValidationSource:
+    enum:
+      - value: required-constraint
+        name: required_constraint
+      - value: unique-constraint
+        name: unique_constraint
+      - value: custom-logic
+        name: custom_logic
+      - unlinked
+      - value: invalid-option
+        name: invalid_option
+  
+  GetFieldsResponse:
+    properties:
+      data: optional<FieldResponse>
+
+  FieldResponse:
+    docs: A field with one or many records
+    type: map<string, FieldsData>
+
+  FieldsData:
+    docs: Array of field data
+    type: list<FieldData>
+
+  FieldData:
+    docs: A single field of data in a Sheet
+    extends: CellValue
+    properties:
+      id: optional<commons.RecordId>
+      counts: optional<RecordCounts>
+  
+  CreateSheetVersionResponse: 
+    properties: 
+      data: commons.VersionId

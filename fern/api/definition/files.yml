@@ -4,35 +4,43 @@ imports:
   commons: commons.yml
 
 service:
-  auth: false
+  auth: true
   base-path: /files
   endpoints:
-    getFiles:
+    list:
       path: ""
       method: GET
       display-name: List files
       request:
+        name: ListFilesRequest
         query-parameters:
           spaceId: optional<string>
-      response: Files
+      response: ListFilesResponse
 
-    createFile:
+    upload:
       path: ""
-      method: POST
+      method: PATCH
       display-name: Upload a file
       request:
-        body: "#/components/requestBodies/UploadFile"
-      response: commons.File
+        name: CreateFileRequest
+        body:
+          properties:
+            spaceId: commons.SpaceId 
+            environmentId: commons.EnvironmentId
+            file:
+              type: string 
+              docs: A binary payload containing the file contents
+      response: FileResponse
 
-    getFile:
+    get:
       path: /{fileId}
       method: GET
       display-name: Get a file
       path-parameters:
         fileId: string
-      response: commons.File
+      response: FileResponse
 
-    deleteFile:
+    delete:
       path: /{fileId}
       method: DELETE
       display-name: Delete a file
@@ -40,32 +48,81 @@ service:
         fileId: string
       response: commons.Success
 
-    updateFileById:
+    update:
       path: /{fileId}
       method: PATCH
       docs: Update a file, to change the workbook id for example
-      display-name: Update a File
+      display-name: Update a file
       path-parameters:
         fileId:
           docs: ID of file to update
           type: string
       request:
-        body: "#/components/requestBodies/File"
-      response: commons.File
+        name: UpdateFileRequest
+        body:
+          properties:
+            workbookId: commons.WorkbookId 
+            status: 
+              type: ModelFileStatusEnum
+              docs: Status of the file
+      response: FileResponse
 
-    downloadFile:
+    download:
       path: /{fileId}/download
       method: GET
       display-name: Download a file
       path-parameters:
-        fileId: string
-      response: DownloadFile
+        fileId: commons.FileId
+      response: 
+        docs: A binary payload containing the file contents
+        type: string
 
 types:
-  Files:
+  ListFilesResponse:
     properties:
-      data: optional<list<commons.File>>
+      data: optional<list<File>>
+  
+  FileResponse:
+    properties:
+      data: optional<File>
 
-  DownloadFile:
-    docs: A binary payload containing the file contents
-    type: string
+  File:
+    docs: Any uploaded file of any type
+    properties:
+      id: commons.FileId
+      name:
+        docs: Original filename
+        type: string
+      ext:
+        docs: Extension of the file
+        type: string
+      mimetype:
+        docs: MIME Type of the file
+        type: string
+      encoding:
+        docs: Text encoding of the file
+        type: string
+      status:
+        docs: Status of the file
+        type: ModelFileStatusEnum
+      size:
+        docs: Size of file in bytes
+        type: integer
+      bytesReceived:
+        docs: Number of bytes that have been uploaded so far (useful for progress tracking)
+        type: integer
+      spaceId: commons.SpaceId
+      workbookId: commons.WorkbookId
+      createdAt:
+        docs: Date the file was created
+        type: string
+      updatedAt:
+        docs: Date the file was last updated
+        type: string
+  
+  ModelFileStatusEnum:
+    enum:
+      - partial
+      - complete
+      - archived
+      - purged

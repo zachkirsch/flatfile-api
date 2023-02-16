@@ -1,0 +1,93 @@
+# yaml-language-server: $schema=https://raw.githubusercontent.com/fern-api/fern/main/fern.schema.json
+
+imports:
+  commons: commons.yml
+  events: events.yml
+
+service:
+  auth: true
+  base-path: /environments/{environmentId}
+  path-parameters:
+    environmentId: commons.EnvironmentId
+  endpoints:
+    list:
+      path: /agents
+      method: GET
+      display-name: List agents
+      response: ListAgentsResponse
+
+    create:
+      path: /agents
+      method: POST
+      display-name: Create an agent
+      request: Agent
+      response: AgentResponse
+      errors: 
+        - commons.BadRequestError
+
+    get:
+      path: /agents/{agentId}
+      method: GET
+      display-name: Get an agent
+      path-parameters:
+        agentId: commons.AgentId
+      response: AgentResponse
+      errors: 
+        - commons.BadRequestError
+        - commons.NotFoundError
+
+    getAgentLogs:
+      path: /agents/{agentId}/logs
+      method: GET
+      display-name: Get logs for an agent
+      path-parameters:
+        agentId: commons.AgentId
+      response: GetAgentLogsResponse
+      errors: 
+        - commons.BadRequestError
+        - commons.NotFoundError
+
+types:
+  ListAgentsResponse:
+    properties:
+      data: optional<list<Agent>>
+  
+  AgentResponse:
+    properties:
+      data: optional<Agent>
+
+  Agent:
+    docs: Properties used to create a new agent
+    properties:
+      topics:
+        docs: The topics the agent should listen for
+        type: optional<list<events.EventTopic>>
+      compiler:
+        docs: The compiler of the agent
+        type: optional<Compiler>
+      source:
+        docs: The source of the agent
+        type: optional<string>
+  
+  Compiler:
+    docs: The compiler of the agent
+    enum:
+      - js
+  
+  GetAgentLogsResponse:
+    properties:
+      pagination: optional<commons.Pagination>
+      data: optional<list<AgentLog>>
+
+  AgentLog:
+    docs: A log of an agent execution
+    properties:
+      eventId: commons.EventId
+      success:
+        docs: Whether the agent execution was successful
+        type: boolean
+      createdAt: string
+      log:
+        docs: The log of the agent execution
+        type: optional<string>
+        

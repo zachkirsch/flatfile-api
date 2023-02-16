@@ -1,30 +1,69 @@
 # yaml-language-server: $schema=https://raw.githubusercontent.com/fern-api/fern/main/fern.schema.json
 
 types:
-  AccessToken:
-    docs: Properties used to allow users to request our private services
-    properties:
-      accessToken: string
-      expiresIn: string
-      expires: string
 
-  User:
-    properties:
-      data: optional<User>
-
-  UserId:
-    docs: User ID
+  AgentId:
+    docs: Agent ID
     type: string
-
-  UserConfig:
-    docs: Properties used to create a new user
-    properties:
-      email: string
-      name: string
-      accountId: AccountId
 
   AccountId:
     docs: Account ID
+    type: string
+  
+  DocumentId:
+    docs: Document ID
+    type: string
+
+  GuestId:
+    docs: Guest ID
+    type: string
+
+  EnvironmentId:
+    docs: Environment ID
+    type: string
+
+  FileId:
+    docs: File ID
+    type: string
+
+  SpaceId:
+    docs: Space ID
+    type: string
+
+  WorkbookId:
+    docs: Workbook ID
+    type: string
+
+  EventId:
+    docs: Event ID
+    type: string
+
+  SheetId:
+    docs: Sheet ID
+    type: string
+
+  VersionId:
+    docs: Version ID
+    type: string
+
+  JobId:
+    docs: Pipeline Job ID
+    type: string
+  
+  UserId:
+    docs: User ID
+    type: string
+  
+  SpaceConfigId:
+    docs: Space Config ID
+    type: string
+  
+  RecordId:
+    docs: Record ID
+    type: string
+
+  FieldId:
+    docs: Field ID
     type: string
 
   Pagination:
@@ -39,340 +78,29 @@ types:
       totalCount:
         docs: total available results
         type: double
-
-  ApiToken:
-    docs: Client id and secret used for authenticating against our APIs
+  
+  Action:
     properties:
-      clientId: string
-      description: string
-      metadata: map<string, unknown>
-      createdAt: string
-      secret: optional<string>
-
-  Guests:
-    properties:
-      data: optional<list<Guest>>
-
-  Guest:
-    properties:
-      data: optional<Guest>
-
-  GuestId:
-    docs: Guest ID
-    type: string
-
-  GuestConfig:
-    docs: Properties used to create a new guest
-    properties:
-      environmentId: EnvironmentId
-      email: string
-      name: string
-      spaces: list<_InlinedType2>
-
-  _InlinedType2:
-    properties:
-      id: SpaceId
-      lastAccessed: optional<string>
-
-  EnvironmentId:
-    docs: Environment ID
-    type: string
+      slug: string
+      label: string
+      type: optional<string>
+      description: optional<string>
+  
+  SortDirection: 
+    enum: 
+      - asc 
+      - desc
 
   Success:
     docs: Informs whether or not a request was successful
     properties:
       success: boolean
-
-  File:
-    properties:
-      data: File
-
-  FileId:
-    docs: File ID
-    type: string
-
-  ModelFileStatusEnum:
-    docs: Status of the file
-    enum:
-      - partial
-      - complete
-      - archived
-      - purged
-
-  SpaceId:
-    docs: Space ID
-    type: string
-
-  WorkbookId:
-    docs: Workbook ID
-    type: string
-
-  Environment:
-    properties:
-      data: optional<Environment>
-
-  EnvironmentConfig:
-    docs: Properties used to create a new environment
-    properties:
-      name:
-        docs: The name of the environment
-        type: string
-      isProd:
-        docs: Whether or not the environment is a production environment
-        type: boolean
-      newSpacesInherit:
-        docs: >-
-          Whether or not new spaces have the option to copy files and guests
-          from existing spaces, defaults to false
-        type: optional<boolean>
-      guestAuthentication: optional<list<_InlinedType3>>
-
-  _InlinedType3:
-    docs: The type of authentication to use for guests
-    enum:
-      - shared_link
-      - magic_link
-
-  AgentLogs:
-    properties:
-      pagination: optional<Pagination>
-      data: optional<list<AgentLog>>
-
-  AgentLog:
-    docs: A log of an agent execution
-    properties:
-      eventId: EventId
-      success:
-        docs: Whether the agent execution was successful
-        type: boolean
-      createdAt: string
-      log:
-        docs: The log of the agent execution
-        type: optional<string>
-
-  EventId:
-    docs: Event ID
-    type: string
-
-  Agent:
-    properties:
-      data: optional<Agent>
-
-  AgentId:
-    docs: Agent ID
-    type: string
-
-  AgentConfig:
-    docs: Properties used to create a new agent
-    properties:
-      topics:
-        docs: The topics the agent should listen for
-        type: optional<list<EventTopic>>
-      compiler:
-        docs: The compiler of the agent
-        type: optional<_InlinedType4>
-      source:
-        docs: The source of the agent
-        type: optional<string>
-
-  _InlinedType4:
-    docs: The compiler of the agent
-    enum:
-      - js
-
-  EventTopic:
-    docs: The topic of the event
-    enum:
-      - space:added
-      - space:removed
-      - workbook:added
-      - workbook:removed
-      - user:added
-      - user:removed
-      - user:online
-      - user:offline
-      - upload:started
-      - upload:failed
-      - upload:completed
-      - job:started
-      - job:waiting
-      - job:updated
-      - job:failed
-      - job:completed
-      - job:deleted
-      - records:created
-      - records:updated
-      - records:deleted
-      - sheet:validated
-      - file:deleted
-      - action:triggered
-
-  Event:
-    properties:
-      data: optional<Event>
-
-  EventConfig:
-    docs: Properties used to create a new event
-    properties:
-      domain:
-        docs: The domain of the event
-        type: _InlinedType5
-      topic: EventTopic
-      context:
-        docs: The context of the event
-        type: _InlinedType6
-      attributes:
-        docs: The attributes of the event
-        type: optional<_InlinedType8>
-      payload:
-        docs: Payload of the event
-        type: map<string, unknown>
-      callbackUrl:
-        docs: The callback url to acknowledge the event
-        type: optional<string>
-      dataUrl:
-        docs: The url to retrieve the data associated with the event
-        type: optional<string>
-      createdAt:
-        docs: Date the event was created
-        type: optional<string>
-      acknowledgedAt:
-        docs: Date the event was acknowledged
-        type: optional<string>
-      acknowledgedBy:
-        docs: The actor (user or system) who acknowledged the event
-        type: optional<string>
-
-  _InlinedType5:
-    docs: The domain of the event
-    enum:
-      - file
-      - space
-      - workbook
-      - job
-
-  _InlinedType6:
-    docs: The context of the event
-    properties:
-      actionName: optional<ActionName>
-      accountId: AccountId
-      environmentId: EnvironmentId
-      spaceId: optional<SpaceId>
-      workbookId: optional<WorkbookId>
-      sheetId: optional<SheetId>
-      sheetSlug: optional<SheetSlug>
-      versionId: optional<VersionId>
-      jobId: optional<JobId>
-      fileId: optional<FileId>
-      precedingEventId: optional<EventId>
-
-  _InlinedType7:
-    docs: The progress of the event within a collection of iterable events
-    properties:
-      current:
-        docs: The current progress of the event
-        type: optional<integer>
-      total:
-        docs: The total number of events in this group
-        type: optional<integer>
-      percent:
-        docs: The percent complete of the event group
-        type: optional<integer>
-
-  _InlinedType8:
-    docs: The attributes of the event
-    properties:
-      progress:
-        docs: The progress of the event within a collection of iterable events
-        type: optional<_InlinedType7>
-
-  ActionName:
-    docs: Name of an action
-    type: string
-
-  SheetId:
-    docs: Sheet ID
-    type: string
-
-  SheetSlug:
-    docs: Sheet Slug
-    type: string
-
-  VersionId:
-    docs: Version ID
-    type: string
-
-  JobId:
-    docs: Pipeline Job ID
-    type: string
-
-  Job:
-    properties:
-      data: optional<Job>
-
-  JobConfig:
-    docs: A single unit of work that a pipeline will execute
-    properties:
-      type:
-        docs: The type of job
-        type: _InlinedType9
-      operation:
-        docs: the type of operation to perform on the data
-        type: optional<_InlinedType10>
-      source: FileOrWorkbookId
-      destination: optional<WorkbookId>
-      trigger:
-        docs: the type of trigger to use for this job
-        type: optional<_InlinedType11>
-      status:
-        docs: the status of the job
-        type: optional<_InlinedType12>
-      progress:
-        docs: the progress of the job
-        type: optional<double>
-
-  _InlinedType9:
-    docs: The type of job
-    enum:
-      - file
-      - workbook
-
-  _InlinedType10:
-    docs: the type of operation to perform on the data
-    enum:
-      - extract
-      - map
-      - delete-records
-
-  _InlinedType11:
-    docs: the type of trigger to use for this job
-    enum:
-      - manual
-      - immediate
-
-  _InlinedType12:
-    docs: the status of the job
-    enum:
-      - planning
-      - ready
-      - executing
-      - complete
-      - failed
-
-  FileOrWorkbookId:
-    docs: The id of a file or workbook
-    type: string
-
-  DeleteJobConfig:
-    docs: The configuration for a delete job
-    properties:
-      filter: Filter
-      filterField:
-        docs: Name of field by which to filter records
-        type: optional<string>
-      sheet: SheetId
-      exceptions: optional<list<RecordId>>
-
+  
+  Error: 
+    properties: 
+      key: optional<string>
+      message: string
+  
   Filter:
     enum:
       - valid
@@ -380,499 +108,11 @@ types:
       - all
       - none
 
-  RecordId:
-    docs: Record ID
-    type: string
-
-  FileJobConfig:
-    properties:
-      driver:
-        docs: The driver to use for extracting data from the file
-        type: _InlinedType13
-
-  _InlinedType13:
-    docs: The driver to use for extracting data from the file
-    enum:
-      - csv
-
-  PipelineJobConfig:
-    properties:
-      sourceSheetId: SheetId
-      destinationSheetId: SheetId
-
-  JobPlan:
-    docs: The job/plan tuple that contains the full plan and the jobs status
-    properties:
-      job: optional<Job>
-      plan: optional<Plan>
-
-  Plan:
-    docs: >-
-      The execution plan for a job, for example, for a map job, the execution
-      plan is the mapping of the source sheet to the destination sheet.
-    properties:
-      fieldMapping: optional<list<_InlinedType18>>
-      unmappedSourceFields: optional<list<_InlinedType19>>
-      unmappedDestinationFields: optional<list<_InlinedType22>>
-      headerRowCount:
-        docs: The number of rows to skip before reading data from the document
-        type: optional<integer>
-
-  _InlinedType14:
-    properties:
-      sourceValue: optional<string>
-      destinationValue: optional<string>
-
-  _InlinedType15:
-    docs: >-
-      Only available if one or more of the destination fields is of type enum.
-      Provides category mapping.
-    properties:
-      mapping: optional<list<_InlinedType14>>
-      unusedSourceValues: optional<list<string>>
-      unusedDestinationValues: optional<list<string>>
-
-  _InlinedType16:
-    enum:
-      - absolute
-      - strong
-      - moderate
-      - weak
-
-  _InlinedType17:
-    properties:
-      certainty: optional<_InlinedType16>
-      source: optional<string>
-
-  _InlinedType18:
-    properties:
-      sourceField: Properties_Property
-      destinationField: Properties_Property
-      preview: optional<list<string>>
-      enumDetails:
-        docs: >-
-          Only available if one or more of the destination fields is of type
-          enum. Provides category mapping.
-        type: optional<_InlinedType15>
-      metadata: optional<_InlinedType17>
-
-  _InlinedType19:
-    properties:
-      sourceField: Properties_Property
-      preview: optional<list<string>>
-
-  _InlinedType20:
-    properties:
-      sourceValue: optional<string>
-      destinationValue: optional<string>
-
-  _InlinedType21:
-    docs: >-
-      Only available if one or more of the destination fields is of type enum.
-      Provides category mapping.
-    properties:
-      mapping: optional<list<_InlinedType20>>
-      unusedSourceValues: optional<list<string>>
-      unusedDestinationValues: optional<list<string>>
-
-  _InlinedType22:
-    properties:
-      enumDetails:
-        docs: >-
-          Only available if one or more of the destination fields is of type
-          enum. Provides category mapping.
-        type: optional<_InlinedType21>
-      destinationField: Properties_Property
-      preview: optional<list<string>>
-
-  SpacePattern:
-    properties:
-      data: optional<SpacePattern>
-
-  SpaceConfigId:
-    docs: Space Config ID
-    type: string
-
-  SpacePatternConfig:
-    docs: Properties used to create a new Space Config
-    properties:
-      slug: string
-      name: string
-      blueprints: list<Blueprint>
-      actions: optional<list<Properties_Action>>
-
-  Blueprint:
-    docs: Properties used to create a new Blueprint
-    properties:
-      slug: string
-      name: string
-      primary: optional<boolean>
-      sheets: list<SheetConfig>
-
-  SheetConfig:
-    docs: Describes shape of data as well as behavior
-    properties:
-      name: string
-      description: optional<string>
-      slug: optional<string>
-      fields: list<Properties_Property>
-      actions: optional<list<Properties_Action>>
-
-  Properties_StringProperty:
-    extends:
-      - Properties_BaseProperty
-      - _InlinedType23
-
-  _InlinedType23:
-    properties:
-      type: optional<_InlinedType24>
-
-  Properties_BaseProperty:
-    properties:
-      key: string
-      type: optional<_InlinedType25>
-      label:
-        docs: User friendly field name
-        type: optional<string>
-      description: optional<string>
-      constraints: optional<list<Properties_Constraint>>
-
-  _InlinedType25:
-    enum:
-      - string
-      - number
-      - boolean
-      - date
-      - enum
-      - reference
-
-  Properties_RequiredConstraint:
-    extends:
-      - Properties_BaseConstraint
-      - _InlinedType26
-
-  _InlinedType26:
-    properties:
-      type: optional<_InlinedType27>
-
-  Properties_BaseConstraint:
-    properties:
-      type: _InlinedType28
-
-  _InlinedType28:
-    enum:
-      - required
-      - unique
-      - computed
-
-  Properties_UniqueConstraint:
-    extends:
-      - Properties_BaseConstraint
-      - _InlinedType29
-
-  _InlinedType29:
-    properties:
-      type: _InlinedType30
-      config: optional<_InlinedType31>
-
-  Properties_ComputedConstraint:
-    extends:
-      - Properties_BaseConstraint
-      - _InlinedType32
-
-  _InlinedType32:
-    properties:
-      type: optional<_InlinedType33>
-
-  Properties_NumberProperty:
-    extends:
-      - Properties_BaseProperty
-      - Properties_ArrayableProperty
-      - _InlinedType34
-
-  _InlinedType34:
-    properties:
-      type: optional<_InlinedType35>
-      config:
-        docs: Optional configuration
-        type: optional<_InlinedType36>
-
-  Properties_ArrayableProperty:
-    properties:
-      is_array:
-        docs: Will allow multiple values and store as an array
-        type: optional<boolean>
-
-  Properties_BooleanProperty:
-    extends:
-      - Properties_BaseProperty
-      - _InlinedType37
-
-  _InlinedType37:
-    properties:
-      type: optional<_InlinedType38>
-      config: optional<_InlinedType39>
-
-  Properties_DateProperty:
-    extends:
-      - Properties_BaseProperty
-      - _InlinedType40
-
-  _InlinedType40:
-    properties:
-      type: optional<_InlinedType41>
-
-  Properties_EnumProperty:
-    extends:
-      - Properties_BaseProperty
-      - Properties_ArrayableProperty
-      - _InlinedType42
-
-  _InlinedType42:
-    properties:
-      type: optional<_InlinedType43>
-      config: _InlinedType44
-
-  Properties_EnumPropertyOption:
-    properties:
-      label:
-        docs: A visual label for this option, defaults to value if not provided
-        type: optional<string>
-      color:
-        docs: An optional color to assign this option
-        type: optional<string>
-      icon:
-        docs: A reference pointer to a previously registered icon
-        type: optional<string>
-      meta:
-        docs: >-
-          An arbitrary JSON object to be associated with this option and made
-          available to hooks
-        type: optional<map<string, unknown>>
-
-  Properties_ReferenceProperty:
-    extends:
-      - Properties_BaseProperty
-      - Properties_ArrayableProperty
-      - _InlinedType45
-
-  _InlinedType45:
-    properties:
-      type: optional<_InlinedType46>
-      config: _InlinedType48
-
-  Properties_Action:
-    properties:
-      slug: string
-      label: string
-      type: optional<string>
-      description: optional<string>
-
-  Space:
-    properties:
-      data: optional<Space>
-
-  SpaceConfig:
-    docs: Properties used to create a new Space
-    properties:
-      spaceConfigId: SpaceConfigId
-      environmentId: EnvironmentId
-      primaryWorkbookId: optional<WorkbookId>
-      name:
-        docs: The name of the space
-        type: optional<string>
-      displayOrder:
-        docs: The display order
-        type: optional<integer>
-      sidebarConfigs: optional<list<SidebarConfig>>
-      actions: optional<list<Properties_Action>>
-
-  WorkbookSidebarConfig:
-    extends:
-      - BaseSideBarConfig
-      - _InlinedType49
-
-  _InlinedType49:
-    properties:
-      workbookId: WorkbookId
-
-  BaseSideBarConfig:
-    properties:
-      type: optional<_InlinedType50>
-
-  _InlinedType50:
-    enum:
-      - workbook
-      - document
-      - link
-
-  DocumentSidebarConfig:
-    extends:
-      - BaseSideBarConfig
-      - _InlinedType51
-
-  _InlinedType51:
-    properties:
-      documentId: DocumentId
-
-  DocumentId:
-    docs: Document ID
-    type: string
-
-  LinkSidebarConfig:
-    extends:
-      - BaseSideBarConfig
-      - _InlinedType52
-
-  _InlinedType52:
-    properties:
-      href:
-        docs: http url of the link
-        type: string
-      title:
-        docs: Space the file should be uploaded to
-        type: string
-
-  Document:
-    properties:
-      data: optional<Document>
-
-  DocumentConfig:
-    docs: Properties used to create a new document
-    properties:
-      title: string
-      body: string
-
-  Workbook:
-    properties:
-      data: optional<Workbook>
-
-  Sheet:
-    docs: A place to store tabular data
-    properties:
-      id: SheetId
-      name: string
-      config: optional<SheetConfig>
-
-  WorkbookConfig:
-    docs: Properties used to create a new Workbook
-    properties:
-      name: string
-      labels: optional<list<string>>
-      spaceId: SpaceId
-      environmentId: EnvironmentId
-      sheets: optional<list<SheetConfig>>
-      actions: optional<list<Properties_Action>>
-
-  RecordsResponse:
-    properties:
-      data: optional<RecordsResponseData>
-
-  RecordsResponseData:
-    docs: A list of records with optional record counts
-    extends:
-      - Success
-      - _InlinedType53
-
-  _InlinedType53:
-    properties:
-      records: optional<RecordsWithLinks>
-      counts: optional<RecordCounts>
-      versionId: optional<VersionId>
-
-  RecordsWithLinks:
-    docs: List of Record objects, including links to related rows
-    type: list<RecordWithLinks>
-
-  RecordWithLinks:
-    docs: A single row of data in a Sheet, including links to related rows
-    properties:
-      id: RecordId
-      workbookId: WorkbookId
-      sheetId: SheetId
-      values: RecordDataWithLinks
-
-  RecordDataWithLinks:
-    docs: A single row of data in a Sheet, including links to related rows
-    type: map<string, CellValueWithLinks>
-
-  CellValueWithLinks:
-    extends:
-      - CellValue
-    properties:
-      links: optional<Records>
-
-  Records:
-    docs: List of Record objects
-    type: list<Record>
-
-  Record:
-    docs: A single row of data in a Sheet
-    properties:
-      id: RecordId
-      workbookId: WorkbookId
-      sheetId: SheetId
-      values: RecordData
-
-  RecordData:
-    docs: A single row of data in a Sheet
-    type: map<string, CellValue>
-
-  CellValue:
-    properties:
-      valid: optional<boolean>
-      messages: optional<list<ValidationMessage>>
-
-  ValidationMessage:
-    docs: Record data validation messages
-    properties:
-      type: optional<_InlinedType54>
-      source: optional<_InlinedType55>
-      message: optional<string>
-
-  _InlinedType54:
-    enum:
-      - error
-      - warn
-      - info
-
-  _InlinedType55:
-    enum:
-      - required-constraint
-      - unique-constraint
-      - custom-logic
-      - unlinked
-      - invalid-option
-
-  RecordCounts:
-    properties:
-      total: optional<double>
-      valid: optional<double>
-      error: optional<double>
-
-  Fields:
-    properties:
-      data: optional<FieldResponse>
-
-  FieldResponse:
-    docs: A field with one or many records
-    type: map<string, FieldsData>
-
-  FieldsData:
-    docs: Array of field data
-    type: list<FieldData>
-
-  FieldData:
-    docs: A single field of data in a Sheet
-    extends:
-      - _InlinedType56
-      - CellValue
-      - _InlinedType57
-
-  _InlinedType56:
-    properties:
-      id: optional<RecordId>
-
-  _InlinedType57:
-    properties:
-      counts: optional<RecordCounts>
+errors: 
+  BadRequestError: 
+    status-code: 400
+    type: list<Error>
+  
+  NotFoundError: 
+    status-code: 404
+    type: list<Error>

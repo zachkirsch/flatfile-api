@@ -2,28 +2,28 @@
 
 imports:
   commons: commons.yml
+  agents: agents.yml
 
 service:
-  auth: false
+  auth: true
   base-path: /environments
   endpoints:
-    getEnvironments:
+    list:
       path: ""
       method: GET
       docs: Get all environments
       display-name: List environments
-      response: Environments
+      response: ListEnvironmentsResponse
 
-    createEnvironment:
+    create:
       path: ""
       method: POST
       docs: Create a new environment
       display-name: Create an environment
-      request:
-        body: commons.#/components/requestBodies/Environment
-      response: commons.Environment
+      request: EnvironmentConfig
+      response: Environment
 
-    getEnvironmentById:
+    get:
       path: /{environmentId}
       method: GET
       docs: Returns a single environment
@@ -32,9 +32,9 @@ service:
         environmentId:
           docs: ID of the environment to return
           type: string
-      response: commons.Environment
+      response: Environment
 
-    updateEnvironmentById:
+    update:
       path: /{environmentId}
       method: PATCH
       docs: Updates a single environment, to change the name for example
@@ -43,17 +43,17 @@ service:
         environmentId:
           docs: ID of the environment to update
           type: string
-      request:
-        body: commons.#/components/requestBodies/Environment
-      response: commons.Environment
+      request: EnvironmentConfig
+      response: Environment
 
-    getAllAgentLogs:
+    getAgentLogs:
       path: /{environmentId}/logs
       method: GET
       display-name: Get all agent logs for an environment
       path-parameters:
         environmentId: string
       request:
+        name: GetAgentLogsRequest
         query-parameters:
           pageSize:
             docs: Number of logs to return in a page (default 20)
@@ -61,9 +61,42 @@ service:
           pageNumber:
             docs: Based on pageSize, which page of records to return
             type: optional<integer>
-      response: commons.AgentLogs
+      response: agents.GetAgentLogsResponse
 
 types:
-  Environments:
+  ListEnvironmentsResponse:
     properties:
-      data: optional<list<commons.Environment>>
+      data: optional<list<Environment>>
+  
+  EnvironmentResponse:
+    properties:
+      data: optional<Environment>
+  
+  Environment: 
+    extends: EnvironmentConfig
+    properties: 
+      id: commons.EnvironmentId
+      accountId: optional<commons.AccountId>
+
+  EnvironmentConfig:
+    docs: Properties used to create a new environment
+    properties:
+      name:
+        docs: The name of the environment
+        type: string
+      isProd:
+        docs: Whether or not the environment is a production environment
+        type: boolean
+      newSpacesInherit:
+        docs: >-
+          Whether or not new spaces have the option to copy files and guests
+          from existing spaces, defaults to false
+        type: optional<boolean>
+      guestAuthentication: optional<list<GuestAuthentication>>
+
+  GuestAuthentication:
+    docs: The type of authentication to use for guests
+    enum:
+      - shared_link
+      - magic_link
+      
