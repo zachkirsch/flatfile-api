@@ -91,12 +91,11 @@ service:
       examples:
         - path-parameters:
             environmentId: $commons.EnvironmentId.Example0
-          request: 
-            query-parameters:
-              pageSize: 5
-              pageNumber: 10
+          query-parameters:
+            pageSize: 5
+            pageNumber: 10
           response:
-            body: $agents.GetAgentLogsResponse
+            body: $agents.GetAgentLogsResponse.Example0
 types:
   ListEnvironmentsResponse:
     properties:

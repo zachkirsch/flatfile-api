@@ -7,6 +7,64 @@ types:
       date: DateProperty
       enum: EnumProperty
       reference: ReferenceProperty
+    examples: 
+      - name: String response 
+        value:
+          key: code
+          type: string
+          label: Product Code
+          description: Unique identifier defining an individual product.
+          constraints:
+            - type: unique
+              config:
+                case_sensitive: false
+          config:
+            size: tiny
+      - name: Number response 
+        value: 
+          key: price
+          type: number
+          config: $NumberConfig.Example0
+      - name: Boolean response 
+        value:
+          key: editable
+          type: boolean
+          config:
+            allow_indeterminate: true 
+      - name: Date response
+        value: 
+          key: Start date 
+          type: date
+      - name: Enum response 
+        value: 
+          key: category
+          label: Product Category
+          type: enum
+          is_array: false
+          multi: true
+          config:
+            allow_custom: false
+            options:
+              - value: 9
+                label: Kitchenware
+                icon: pots-and-pans
+                color: '#f00000'
+                meta:
+                  product_code_prefix: KI-
+              - value: 9
+                label: Clothing
+                meta:
+                  product_code_prefix: CL-
+      - name: Reference response
+        value: 
+          key: user reference
+          type: reference 
+          config: 
+            ref: /sheet/users/3
+            relationship: has-many 
+            key: id
+          
+          
   
   BaseProperty:
     properties:
@@ -15,7 +73,7 @@ types:
         type: optional<string>
         docs: User friendly field name
       description: optional<string>
-      constraints: list<Constraint>
+      constraints: optional<list<Constraint>>
   
   ArrayableProperty:
     properties:
@@ -24,30 +82,36 @@ types:
         type: optional<boolean>
   
   StringProperty:
+    docs: Defines a property that should be stored and read as a basic string. Database engines should expect any length of text to be provided here unless explicitly defined in the config.
     extends:
       - BaseProperty
+    properties:
+      config: optional<StringConfig>
 
   NumberProperty:
+    docs: Defines a property that should be stored and read as either an integer or floating point number. Database engines should look at the configuration to determine ideal storage format.
     extends:
       - BaseProperty
       - ArrayableProperty
     properties:
-      config:
-        docs: Optional configuration
-        type: optional<NumberConfig>
+      config: optional<NumberConfig>
 
   NumberConfig:
-    docs: Optional configuration
     properties:
       decimal_places:
         docs: Number of decimal places to round data to
         type: integer
+    examples: 
+      - name: Example0 
+        value: 
+          decimal_places: 2
   
   BooleanProperty:
+    docs: A `true` or `false` value type. Matching engines should attempt to resolve all common ways of representing this value and it should usually be displayed as a checkbox.
     extends: BaseProperty
     properties:
       config: optional<BooleanPropertyConfig>
-
+          
   BooleanPropertyConfig:
     properties:
       allow_indeterminate:
@@ -55,14 +119,19 @@ types:
         docs: Allow a neither true or false state to be stored as `null`
 
   DateProperty:
+    docs: Store a field as a GMT date. Data hooks must convert this value into a `YYYY-MM-DD` format in order for it to be considered a valid value. Datetime should be a separate and future supported value as it must consider timezone.
     extends:
-      - BaseProperty
+      - BaseProperty   
 
   EnumProperty:
+    docs: Defines an enumerated list of options for the user to select from. Matching tooling attempts to resolve incoming data assigment to a valid option. The maximum number of options for this list is `100`. For larger lists, users should use the reference or future `lookup` types.
     extends:
       - BaseProperty
       - ArrayableProperty
     properties:
+      multi: 
+        docs: Will allow multiple values and store / provide the values in an array if set. Not all field types support arrays.	
+        type: optional<boolean>
       config: EnumPropertyConfig
 
   EnumPropertyConfig:
@@ -95,6 +164,7 @@ types:
         type: unknown
 
   ReferenceProperty:
+    docs: Defines a reference to another sheet. Links should be established automatically by the matching engine or similar upon an evaluation of unique or similar columns between datasets.
     extends:
       - BaseProperty
       - ArrayableProperty
@@ -133,8 +203,24 @@ types:
   UniqueConstraintConfig:
     properties:
       case_sensitive:
-        type: boolean
+        type: optional<boolean>
         docs: Ignore casing when determining uniqueness
       ignore_empty:
-        type: boolean
+        type: optional<boolean>
         docs: Do not flag empty values as duplicate
+
+  StringConfig:
+    properties: 
+      size: StringConfigOptions
+
+  StringConfigOptions: 
+    docs: How much text should be storeable in this field
+    enum: 
+      - value: tiny 
+        docs: up to 255 characters
+      - value: normal
+        docs: 64kb (default)
+      - value: medium
+        docs: 16mb
+      - value: long
+        docs: 4gb

@@ -332,6 +332,9 @@ types:
         name: action_triggered
       - value: file:deleted
         name: file_deleted
+    examples:
+      - name: Example0 
+        value: upload:started
 
   Domain:
     docs: The domain of the event
@@ -340,6 +343,9 @@ types:
       - space
       - workbook
       - job
+    examples:
+      - name: Example0 
+        value: job
 
   Context:
     docs: The context of the event

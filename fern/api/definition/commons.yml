@@ -42,7 +42,7 @@ types:
     type: string
     examples: 
       - name: Example0 
-        value: 
+        value: us_fl_qGZbKwDW
 
   SpaceId:
     docs: Space ID
@@ -91,7 +91,7 @@ types:
     type: string
     examples: 
       - name: Example0 
-        value: 
+        value: us_usr_a7Ws9cue
   
   SpaceConfigId:
     docs: Space Config ID
