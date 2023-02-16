@@ -14,6 +14,17 @@ service:
       docs: Get all environments
       display-name: List environments
       response: ListEnvironmentsResponse
+      examples:
+        - response:
+            body: 
+              data:
+              - id: us_env_hVXkXs0b
+                accountId: us_acc_uj6s91wc
+                name: dev
+                isProd: false
+                newSpacesInherit: false
+                guestAuthentication:
+                  - magic_link
 
     create:
       path: ""
@@ -22,6 +33,10 @@ service:
       display-name: Create an environment
       request: EnvironmentConfig
       response: Environment
+      examples:
+        - request: $EnvironmentConfig.Example0
+          response:
+            body: $Environment.Example0
 
     get:
       path: /{environmentId}
@@ -33,6 +48,11 @@ service:
           docs: ID of the environment to return
           type: string
       response: Environment
+      examples:
+        - path-parameters:
+            environmentId: $commons.EnvironmentId.Example0
+          response:
+            body: $Environment.Example0
 
     update:
       path: /{environmentId}
@@ -45,6 +65,12 @@ service:
           type: string
       request: EnvironmentConfig
       response: Environment
+      examples: 
+        - path-parameters:
+            environmentId: $commons.EnvironmentId.Example0
+          request: $EnvironmentConfig.Example0
+          response:
+            body: $Environment.Example0
 
     getAgentLogs:
       path: /{environmentId}/logs
@@ -62,7 +88,14 @@ service:
             docs: Based on pageSize, which page of records to return
             type: optional<integer>
       response: agents.GetAgentLogsResponse
-
+      examples:
+        - path-parameters:
+            environmentId: $commons.EnvironmentId.Example0
+          query-parameters:
+            pageSize: 5
+            pageNumber: 10
+          response:
+            body: $agents.GetAgentLogsResponse.Example0
 types:
   ListEnvironmentsResponse:
     properties:
@@ -77,6 +110,16 @@ types:
     properties: 
       id: commons.EnvironmentId
       accountId: optional<commons.AccountId>
+    examples:
+      - name: Example0 
+        value: 
+          name: dev
+          isProd: false
+          newSpacesInherit: false
+          guestAuthentication:
+            - magic_link
+          id: $commons.EnvironmentId.Example0
+          accountId: $commons.AccountId.Example0
 
   EnvironmentConfig:
     docs: Properties used to create a new environment
@@ -93,6 +136,14 @@ types:
           from existing spaces, defaults to false
         type: optional<boolean>
       guestAuthentication: optional<list<GuestAuthentication>>
+    examples:
+      - name: Example0 
+        value: 
+          name: dev
+          isProd: false
+          newSpacesInherit: false
+          guestAuthentication:
+            - magic_link
 
   GuestAuthentication:
     docs: The type of authentication to use for guests

@@ -15,6 +15,12 @@ service:
       method: GET
       display-name: List agents
       response: ListAgentsResponse
+      examples: 
+        - name: Example0 
+          path-parameters:
+            environmentId: $commons.EnvironmentId.Example0
+          response: 
+            body: $ListAgentsResponse.Example0
 
     create:
       path: /agents
@@ -24,6 +30,22 @@ service:
       response: AgentResponse
       errors: 
         - commons.BadRequestError
+      examples: 
+        - name: Agent Response 
+          path-parameters:
+            environmentId: $commons.EnvironmentId.Example0
+          request: $Agent.Example0
+          response: 
+            body: $AgentResponse.Example0
+        - name: Error Response
+          path-parameters:
+            environmentId: $commons.EnvironmentId.Example0
+          request: $Agent.Example0 
+          response:
+            error: commons.BadRequestError
+            body:
+              - key: "123"
+                message: "ID 123 not found"
 
     get:
       path: /agents/{agentId}
@@ -35,6 +57,13 @@ service:
       errors: 
         - commons.BadRequestError
         - commons.NotFoundError
+      examples: 
+        - name: Example0 
+          path-parameters:
+            environmentId: $commons.EnvironmentId.Example0
+            agentId: $commons.AgentId.Example0
+          response: 
+            body: $AgentResponse.Example0
 
     getAgentLogs:
       path: /agents/{agentId}/logs
@@ -46,15 +75,31 @@ service:
       errors: 
         - commons.BadRequestError
         - commons.NotFoundError
+      examples:
+        - name: Example0 
+          path-parameters:
+            agentId: $commons.AgentId.Example0
+            environmentId: $commons.EnvironmentId.Example0
+          response: 
+            body: $GetAgentLogsResponse.Example0
 
 types:
   ListAgentsResponse:
     properties:
       data: optional<list<Agent>>
+    examples:
+      - name: Example0 
+        value: 
+          data: 
+            - $Agent.Example0
   
   AgentResponse:
     properties:
       data: optional<Agent>
+    examples:
+      - name: Example0 
+        value: 
+          data: $Agent.Example0    
 
   Agent:
     docs: Properties used to create a new agent
@@ -68,16 +113,32 @@ types:
       source:
         docs: The source of the agent
         type: optional<string>
+    examples: 
+      - name: Example0 
+        value: 
+          topics: 
+            - $events.EventTopic.Example0
+          compiler: $Compiler.Example0
+          source: "module.exports = { routeEvent: async (...args) => { console.log(args) } }"
   
   Compiler:
     docs: The compiler of the agent
     enum:
       - js
+    examples: 
+      - name: Example0 
+        value: js
   
   GetAgentLogsResponse:
     properties:
       pagination: optional<commons.Pagination>
       data: optional<list<AgentLog>>
+    examples:
+      - name: Example0 
+        value: 
+          pagination: $commons.Pagination.Example0
+          data: 
+            - $AgentLog.Example0
 
   AgentLog:
     docs: A log of an agent execution
@@ -90,4 +151,10 @@ types:
       log:
         docs: The log of the agent execution
         type: optional<string>
-        
+    examples: 
+      - name: Example0 
+        value: 
+          eventId: us_evt_9cuesESa7W9cuesE
+          success: true
+          createdAt: '2022-09-18T00:19:57.007Z'
+          log: SUCCESS       

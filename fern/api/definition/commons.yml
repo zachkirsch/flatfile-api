@@ -5,79 +5,133 @@ types:
   AgentId:
     docs: Agent ID
     type: string
+    examples: 
+      - name: Example0 
+        value: us_ag_qGZbKwDW
 
   AccountId:
     docs: Account ID
     type: string
+    examples: 
+      - name: Example0 
+        value: us_acc_uj6s91wc
   
   DocumentId:
     docs: Document ID
     type: string
+    examples: 
+      - name: Example0 
+        value: us_dc_KwDW6cfH
 
   GuestId:
     docs: Guest ID
     type: string
+    examples: 
+      - name: Example0 
+        value: us_g_5ue7P9cU
 
   EnvironmentId:
     docs: Environment ID
     type: string
+    examples: 
+      - name: Example0 
+        value: us_env_hVXkXs0b
 
   FileId:
     docs: File ID
     type: string
+    examples: 
+      - name: Example0 
+        value: us_fl_qGZbKwDW
 
   SpaceId:
     docs: Space ID
     type: string
+    examples: 
+      - name: Example0 
+        value: us_sp_DrdXetPN
 
   WorkbookId:
     docs: Workbook ID
     type: string
+    examples: 
+      - name: Example0 
+        value: us_wb_qGZbKwDW
 
   EventId:
     docs: Event ID
     type: string
+    examples: 
+      - name: Example0 
+        value: us_evt_9cuesESa7W9cuesE
 
   SheetId:
     docs: Sheet ID
     type: string
+    examples: 
+      - name: Example0 
+        value: us_sh_fHfzjzHb
 
   VersionId:
     docs: Version ID
     type: string
+    examples: 
+      - name: Example0 
+        value: us_vr_jte4tzVn
 
   JobId:
     docs: Pipeline Job ID
     type: string
+    examples: 
+      - name: Example0 
+        value: us_jb_UQg89Drd
   
   UserId:
     docs: User ID
     type: string
+    examples: 
+      - name: Example0 
+        value: us_usr_a7Ws9cue
   
   SpaceConfigId:
     docs: Space Config ID
     type: string
+    examples: 
+      - name: Example0 
+        value: us_sc_uj691wck
   
   RecordId:
     docs: Record ID
     type: string
+    examples: 
+      - name: Example0 
+        value: us_rc_a7W9cuesESa7W9cu
 
   FieldId:
     docs: Field ID
     type: string
+    examples: 
+      - name: Example0 
+        value: additionalProp1
 
   Pagination:
     docs: pagination info
     properties:
       currentPage:
         docs: current page of results
-        type: double
+        type: integer
       pageCount:
         docs: total number of pages of results
-        type: double
+        type: integer
       totalCount:
         docs: total available results
-        type: double
+        type: integer
+    examples:
+      - name: Example0 
+        value: 
+          currentPage: 3
+          pageCount: 50
+          totalCount: 100
   
   Action:
     properties:
@@ -90,16 +144,24 @@ types:
     enum: 
       - asc 
       - desc
+    examples: 
+      - name: Example0 
+        value: asc
 
   Success:
     docs: Informs whether or not a request was successful
     properties:
       success: boolean
+    examples: 
+      - name: Example0 
+        value: 
+          success: true 
   
   Error: 
     properties: 
       key: optional<string>
       message: string
+          
   
   Filter:
     enum:
