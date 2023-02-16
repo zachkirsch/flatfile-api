@@ -1,0 +1,85 @@
+# yaml-language-server: $schema=https://raw.githubusercontent.com/fern-api/fern/main/fern.schema.json
+
+imports:
+  commons: commons.yml
+  sheets: sheets.yml
+
+service:
+  auth: true
+  base-path: /workbooks
+  endpoints:
+    list:
+      path: ""
+      method: GET
+      docs: Returns all workbooks matching a filter for an account or space
+      display-name: List workbooks
+      request:
+        name: ListWorkbooksRequest
+        query-parameters:
+          spaceId: optional<commons.SpaceId>
+      response: ListWorkbooksResponse
+
+    create:
+      path: ""
+      method: POST
+      docs: Creates a workbook and adds it to a space
+      display-name: Create a workbook
+      request: WorkbookConfig
+      response: WorkbookResponse
+
+    get:
+      path: /{workbookId}
+      method: GET
+      docs: Returns a single workbook
+      display-name: Get a workbook
+      path-parameters:
+        workbookId:
+          docs: ID of workbook to return
+          type: commons.WorkbookId
+      response: WorkbookResponse
+
+    delete:
+      path: /{workbookId}
+      method: DELETE
+      docs: Delete a workbook
+      display-name: Delete a workbook
+      path-parameters:
+        workbookId:
+          docs: ID of workbook to delete
+          type: commons.WorkbookId
+      response: commons.Success
+
+types:
+  ListWorkbooksResponse:
+    properties:
+      data: optional<list<Workbook>>
+  
+  WorkbookResponse: 
+    properties: 
+      data: optional<Workbook>
+  
+  Workbook: 
+    docs: A collection of one or more sheets 
+    properties:
+      id: commons.WorkbookId
+      name: optional<string>
+      spaceId: commons.SpaceId 
+      environmentId: optional<commons.EnvironmentId>
+      sheets: optional<list<sheets.Sheet>>
+      config: WorkbookConfig
+      labels: optional<list<string>>
+
+  WorkbookConfig:
+    docs: Properties used to create a new Workbook
+    properties:
+      name: string
+      labels: optional<list<string>>
+      spaceId: commons.SpaceId
+      environmentId: commons.EnvironmentId
+      sheets: 
+        type: optional<list<sheets.SheetConfig>>
+        docs: Sheets must be <= 50
+      actions: optional<list<commons.Action>>
+
+
+      

@@ -4,22 +4,22 @@ imports:
   commons: commons.yml
 
 service:
-  auth: false
+  auth: true
   base-path: /files
   endpoints:
-    getAll:
+    list:
       path: ""
       method: GET
       display-name: List files
       request:
-        name: GetAllFilesRequest
+        name: ListFilesRequest
         query-parameters:
           spaceId: optional<string>
-      response: Files
+      response: ListFilesResponse
 
-    create:
+    upload:
       path: ""
-      method: POST
+      method: PATCH
       display-name: Upload a file
       request:
         name: CreateFileRequest
@@ -28,9 +28,9 @@ service:
             spaceId: commons.SpaceId 
             environmentId: commons.EnvironmentId
             file:
-              type: string #TODO support binary
+              type: string 
               docs: A binary payload containing the file contents
-      response: commons.File
+      response: FileResponse
 
     get:
       path: /{fileId}
@@ -38,7 +38,7 @@ service:
       display-name: Get a file
       path-parameters:
         fileId: string
-      response: commons.File
+      response: FileResponse
 
     delete:
       path: /{fileId}
@@ -62,22 +62,67 @@ service:
         body:
           properties:
             workbookId: commons.WorkbookId 
-            status: commons.ModelFileStatusEnum
-      response: commons.File
+            status: 
+              type: ModelFileStatusEnum
+              docs: Status of the file
+      response: FileResponse
 
     download:
       path: /{fileId}/download
       method: GET
       display-name: Download a file
       path-parameters:
-        fileId: string
-      response: DownloadFile
+        fileId: commons.FileId
+      response: 
+        docs: A binary payload containing the file contents
+        type: string
 
 types:
-  Files:
+  ListFilesResponse:
     properties:
-      data: optional<list<commons.File>>
+      data: optional<list<File>>
+  
+  FileResponse:
+    properties:
+      data: optional<File>
 
-  DownloadFile:
-    docs: A binary payload containing the file contents
-    type: string
+  File:
+    docs: Any uploaded file of any type
+    properties:
+      id: commons.FileId
+      name:
+        docs: Original filename
+        type: string
+      ext:
+        docs: Extension of the file
+        type: string
+      mimetype:
+        docs: MIME Type of the file
+        type: string
+      encoding:
+        docs: Text encoding of the file
+        type: string
+      status:
+        docs: Status of the file
+        type: ModelFileStatusEnum
+      size:
+        docs: Size of file in bytes
+        type: integer
+      bytesReceived:
+        docs: Number of bytes that have been uploaded so far (useful for progress tracking)
+        type: integer
+      spaceId: commons.SpaceId
+      workbookId: commons.WorkbookId
+      createdAt:
+        docs: Date the file was created
+        type: string
+      updatedAt:
+        docs: Date the file was last updated
+        type: string
+  
+  ModelFileStatusEnum:
+    enum:
+      - partial
+      - complete
+      - archived
+      - purged
