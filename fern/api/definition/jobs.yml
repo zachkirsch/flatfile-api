@@ -5,7 +5,7 @@ imports:
   property: property.yml
 
 service:
-  auth: false
+  auth: true
   base-path: /jobs
   endpoints:
     list:

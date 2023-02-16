@@ -5,7 +5,7 @@ imports:
   events: events.yml
 
 service:
-  auth: false
+  auth: true
   base-path: /environments/{environmentId}
   path-parameters:
     environmentId: commons.EnvironmentId

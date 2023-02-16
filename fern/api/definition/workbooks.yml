@@ -5,7 +5,7 @@ imports:
   sheets: sheets.yml
 
 service:
-  auth: false
+  auth: true
   base-path: /workbooks
   endpoints:
     list:

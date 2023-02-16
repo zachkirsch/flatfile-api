@@ -4,7 +4,7 @@ imports:
   commons: commons.yml
 
 service:
-  auth: false
+  auth: true
   base-path: /spaces/{spaceId}/documents
   path-parameters:
     spaceId:
