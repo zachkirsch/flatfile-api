@@ -5,9 +5,9 @@ groups:
         version: 0.1.2-8-g4301a963
         output:
           location: npm
-          package-name: '@fern-api/flatfile'
+          package-name: '@flatfile/api-beta'
           token: ${NPM_TOKEN}
         config: 
           namespaceExport: Flatfile
         github:
-          repository: fern-flatfile/flatfile-node
+          repository: FlatFilers/flatfile-node
