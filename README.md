@@ -8,7 +8,7 @@ Tagging a release on this repository will update the:
 
 This repository contains
 
-- Flatfile's Fern API Definition which lives in the [definition](./fern/api/definition/) folder
+- Flatfile's API Definition which lives in the [definition](./fern/api/definition/) folder
 - Generators (see [generators.yml](./fern/api/generators.yml))
 
 ## What is in the API Definition?
