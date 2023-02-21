@@ -2,7 +2,7 @@
 
 Tagging a release on this repository will update the:
 
-- [Node.js SDK repo](https://github.com/fern-flatfile/flatfile-node)
+- [Node.js SDK repo](https://github.com/FlatFilers/flatfile-node)
 
 ## What is in this repository?
 
