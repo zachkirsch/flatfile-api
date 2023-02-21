@@ -71,11 +71,11 @@ service:
 types:
   ListAllEventsResponse:
     properties:
-      data: optional<list<Event>>
+      data: list<Event>
   
   EventResponse:
     properties:
-      data: optional<Event>
+      data: Event
 
   Event:
     docs: Properties used to create a new event

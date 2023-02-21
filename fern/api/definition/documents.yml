@@ -64,7 +64,7 @@ service:
 types: 
   ListDocumentsResponse:
     properties:
-      data: optional<list<Document>>
+      data: list<Document>
 
   DocumentResponse: 
     properties:

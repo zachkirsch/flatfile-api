@@ -80,11 +80,11 @@ service:
 types:
   ListFilesResponse:
     properties:
-      data: optional<list<File>>
+      data: list<File>
   
   FileResponse:
     properties:
-      data: optional<File>
+      data: File
 
   File:
     docs: Any uploaded file of any type

@@ -93,11 +93,11 @@ service:
 types:
   ListJobsResponse:
     properties:
-      data: optional<list<Job>>
+      data: list<Job>
   
   JobResponse:
     properties:
-      data: optional<Job>
+      data: Job
 
   Job: 
     docs: A single unit of work that will execute asynchronously
@@ -191,7 +191,7 @@ types:
 
   JobPlanObject:
     properties:
-      data: optional<JobPlan>
+      data: JobPlan
 
   JobPlan:
     docs: The job/plan tuple that contains the full plan and the jobs status

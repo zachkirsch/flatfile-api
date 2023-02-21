@@ -77,7 +77,7 @@ service:
 types: 
   ListGuestsResponse: 
     properties: 
-      data: optional<list<Guest>>
+      data: list<Guest>
 
   Guest: 
     extends: GuestConfig

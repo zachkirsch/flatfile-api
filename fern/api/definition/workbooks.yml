@@ -56,7 +56,7 @@ types:
   
   WorkbookResponse: 
     properties: 
-      data: optional<Workbook>
+      data: Workbook
   
   Workbook: 
     docs: A collection of one or more sheets 
