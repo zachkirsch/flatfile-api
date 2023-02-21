@@ -52,7 +52,7 @@ service:
 types: 
   ListSpaceConfigsResponse:
     properties:
-      data: optional<list<SpacePattern>>
+      data: list<SpacePattern>
   
   SpacePatternResponse: 
     properties: 

@@ -298,7 +298,7 @@ types:
   
   SheetResponse:
     properties:
-      data: optional<Sheet>
+      data: Sheet
 
   Sheet:
     docs: A place to store tabular data
@@ -318,7 +318,7 @@ types:
 
   RecordsResponse:
     properties:
-      data: optional<RecordsResponseData>
+      data: RecordsResponseData
 
   RecordsResponseData:
     docs: A list of records with optional record counts
@@ -409,7 +409,7 @@ types:
   
   GetFieldsResponse:
     properties:
-      data: optional<FieldResponse>
+      data: FieldResponse
 
   FieldResponse:
     docs: A field with one or many records

@@ -86,11 +86,11 @@ types:
   ListSpacesResponse: 
     properties: 
       pagination: optional<commons.Pagination>
-      data: optional<list<Space>>
+      data: list<Space>
   
   SpaceResponse: 
     properties: 
-      data: optional<Space>
+      data: Space
   
   Space: 
     docs: A place to store your workbooks

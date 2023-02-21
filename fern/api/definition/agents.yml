@@ -86,7 +86,7 @@ service:
 types:
   ListAgentsResponse:
     properties:
-      data: optional<list<Agent>>
+      data: list<Agent>
     examples:
       - name: Example0 
         value: 
@@ -95,7 +95,7 @@ types:
   
   AgentResponse:
     properties:
-      data: optional<Agent>
+      data: Agent
     examples:
       - name: Example0 
         value: 
@@ -132,7 +132,7 @@ types:
   GetAgentLogsResponse:
     properties:
       pagination: optional<commons.Pagination>
-      data: optional<list<AgentLog>>
+      data: list<AgentLog>
     examples:
       - name: Example0 
         value: 

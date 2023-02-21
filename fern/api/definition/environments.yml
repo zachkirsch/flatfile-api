@@ -99,11 +99,11 @@ service:
 types:
   ListEnvironmentsResponse:
     properties:
-      data: optional<list<Environment>>
+      data: list<Environment>
   
   EnvironmentResponse:
     properties:
-      data: optional<Environment>
+      data: Environment
   
   Environment: 
     extends: EnvironmentConfig
