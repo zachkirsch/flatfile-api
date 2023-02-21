@@ -1,5 +1,5 @@
 groups:
-  publish:
+  sdks:
     generators:
       - name: fernapi/fern-typescript-sdk
         version: 0.1.2-8-g4301a963
